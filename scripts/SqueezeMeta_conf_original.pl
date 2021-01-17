@@ -2,12 +2,12 @@
 
 use File::Basename;
 use Cwd 'abs_path';
-$projectdir   = abs_path(dirname(__FILE__));
+$projectdir   = "assembly/squeezemeta;
 
 
 #-- Generic paths
 
-$databasepath = "/media/disk7/fer/SqueezeMeta/db";
+$databasepath = "$projectdir/databases/squeezemeta/db";
 $extdatapath  = "$installpath/data";
 $scriptdir    = "$installpath/scripts";   #-- Scripts directory
 
