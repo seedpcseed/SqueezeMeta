@@ -2,7 +2,7 @@
 
 use File::Basename;
 use Cwd 'abs_path';
-$projectdir   = "assembly/squeezemeta;
+$projectdir   = "assembly/squeezemeta";
 
 
 #-- Generic paths
