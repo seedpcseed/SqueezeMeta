@@ -28,16 +28,16 @@ if(-l __FILE__)
 	{
 	my $symlinkpath = dirname(__FILE__);
         my $symlinkdest = readlink(__FILE__);
-	 $scriptdir = dirname("$symlinkpath/$symlinkdest");
-#        $scriptdir = dirname(abs_path("$symlinkpath/$symlinkdest"));
+	 # $scriptdir = dirname("$symlinkpath/$symlinkdest");
+   $scriptdir = dirname(abs_path("$symlinkpath/$symlinkdest"));
         }
 else
 	{
-	# $scriptdir = abs_path(dirname(__FILE__));
-	$scriptdir = dirname(__FILE__);
+	$scriptdir = abs_path(dirname(__FILE__));
+	# $scriptdir = dirname(__FILE__);
 	}
-our $installpath = "$scriptdir/..";
-# our $installpath = abs_path("$scriptdir/..");
+# our $installpath = "$scriptdir/..";
+our $installpath = abs_path("$scriptdir/..");
 
 ###
 
@@ -45,7 +45,7 @@ our $pwd=cwd();
 our($nocog,$nokegg,$nopfam,$singletons,$euknofilter,$opt_db,$nobins,$nomaxbin,$nometabat,$lowmem,$minion,,$consensus,$doublepass)="0";
 our($numsamples,$numthreads,$canumem,$mode,$mincontiglen,$assembler,$extassembly,$mapper,$projectdir,$projectname,$project,$equivfile,$rawfastq,$blocksize,$evalue,$miniden,$assembler_options,$cleaning,$cleaningoptions,$ver,$hel,$methodsfile,$test);
 our($databasepath,$extdatapath,$softdir,$datapath,$resultpath,$extpath,$tempdir,$interdir,$mappingfile,$contigsfna,$gff_file_blastx,$contigslen,$mcountfile,$checkmfile,$rnafile,$gff_file,$aafile,$ntfile,$daafile,$taxdiamond,$cogdiamond,$keggdiamond,$pfamhmmer,$fun3tax,$fun3kegg,$fun3cog,$fun3pfam,$allorfs,$alllog,$mapcountfile,$contigcov,$contigtable,$mergedfile,$bintax,$bincov,$bintable,$contigsinbins,$coglist,$kegglist,$pfamlist,$taxlist,$nr_db,$cog_db,$kegg_db,$lca_db,$bowtieref,$pfam_db,$metabat_soft,$maxbin_soft,$spades_soft,$barrnap_soft,$bowtie2_build_soft,$bowtie2_x_soft,$bwa_soft,$minimap2_soft,$bedtools_soft,$diamond_soft,$hmmer_soft,$megahit_soft,$prinseq_soft,$prodigal_soft,$cdhit_soft,$toamos_soft,$minimus2_soft,$canu_soft,$trimmomatic_soft,$dastool_soft);
-our(%bindirs,%dasdir);  
+our(%bindirs,%dasdir);
 
 #-- Define help text
 
@@ -64,22 +64,22 @@ Arguments:
    -s|-samples <samples file>: Samples file (REQUIRED)
    -f|-seq <sequence dir>: fastq/fasta read files' directory (REQUIRED)
    -p <project name>: Project name (REQUIRED in coassembly and merged modes)
-   
- Filtering: 
+
+ Filtering:
    --cleaning: Filters with Trimmomatic (Default: No)
    -cleaning_options [options]: Options for Trimmomatic (Default:LEADING:8 TRAILING:8 SLIDINGWINDOW:10:15 MINLEN:30)
-   
- Assembly: 
+
+ Assembly:
    -a: assembler <megahit,spades,canu, flye> (Default: megahit)
    -assembly_options [options]: Options for required assembler
    -c|-contiglen <size>: Minimum length of contigs (Default: 200)
    -extassembly <file>: External assembly, file containing a fasta file of contigs (overrides all assembly steps).
-   --sg|--singletons: Add unassembled reads to the contig file, as if they were contigs  
-   
- Mapping: 
-   -map: mapping software <bowtie, bwa, minimap2-ont, minimap2-pb, minimap2-sr> (Default: bowtie) 
+   --sg|--singletons: Add unassembled reads to the contig file, as if they were contigs
 
- Annotation:  
+ Mapping:
+   -map: mapping software <bowtie, bwa, minimap2-ont, minimap2-pb, minimap2-sr> (Default: bowtie)
+
+ Annotation:
    --nocog: Skip COG assignment (Default: no)
    --nokegg: Skip KEGG assignment (Default: no)
    --nopfam: Skip Pfam assignment  (Default: no)
@@ -88,12 +88,12 @@ Arguments:
    --D|--doublepass: First pass looking for genes using gene prediction, second pass using BlastX  (Default: no)
    -extdb <database file>: List of user-provided databases
    -b|-block-size <block size>: block size for diamond against the nr database (Default: 8)
-   
+
  Binning:
    --nobins: Skip all binning  (Default: no)
    --nomaxbin: Skip MaxBin binning  (Default: no)
    --nometabat: Skip MetaBat2 binning  (Default: no)
-   
+
  Performance:
    -t <threads>: Number of threads (Default: 12)
    -canumem <mem>: memory for canu in Gb (Default: 32)
@@ -102,11 +102,11 @@ Arguments:
  Other:
    --minion: Run on MinION reads (assembler: canu; mapper: minimap2-ont; consensus: 20) (Default: no)
    -test <step>: Running in test mode, stops AFTER the given step number
-   
+
  Information:
-   -v: Version number  
-   -h: This help 
-     
+   -v: Version number
+   -h: This help
+
 END_MESSAGE
 
 #-- Handle variables from command line
@@ -121,21 +121,21 @@ my $result = GetOptions ("t=i" => \$numthreads,
                      "p=s" => \$projectdir,
                      "s|samples=s" => \$equivfile,
                      "extassembly=s" => \$extassembly,
-                     "f|seq=s" => \$rawfastq, 
+                     "f|seq=s" => \$rawfastq,
                      "sg|singletons" => \$singletons,
-		     "nocog" => \$nocog,   
-		     "nokegg" => \$nokegg,   
-		     "nopfam" => \$nopfam,  
+		     "nocog" => \$nocog,
+		     "nokegg" => \$nokegg,
+		     "nopfam" => \$nopfam,
 		     "euk" => \$euknofilter,
-		     "extdb=s" => \$opt_db, 
-		     "nobins" => \$nobins,   
-		     "nomaxbin" => \$nomaxbin,   
-		     "nometabat" => \$nometabat,  
+		     "extdb=s" => \$opt_db,
+		     "nobins" => \$nobins,
+		     "nomaxbin" => \$nomaxbin,
+		     "nometabat" => \$nometabat,
 		     "consensus" => \$consensus,
-		     "D|doublepass" => \$doublepass, 
+		     "D|doublepass" => \$doublepass,
 		     "b|block_size=i" => \$blocksize,
-		     "e|evalue=f" => \$evalue,   
-		     "minidentity=f" => \$miniden,   
+		     "e|evalue=f" => \$evalue,
+		     "minidentity=f" => \$miniden,
 		     "assembly_options=s" => \$assembler_options,
 		     "cleaning" => \$cleaning,
 		     "cleaning_options=s" => \$cleaningoptions,
@@ -163,11 +163,11 @@ if(!$nobins) { $nobins=0; }
 if(!$nomaxbin) { $nomaxbin=0; }
 if(!$nometabat) { $nometabat=0; }
 if(!$cleaningoptions) { $cleaningoptions="LEADING:8 TRAILING:8 SLIDINGWINDOW:10:15 MINLEN:30"; }
-if(!$cleaning) { $cleaning=0; $cleaningoptions=""; } 
+if(!$cleaning) { $cleaning=0; $cleaningoptions=""; }
 if($consensus) { $consensus/=100; }
 
 $mode=~tr/A-Z/a-z/;
-# if($opt_db) { $opt_db = abs_path($opt_db); }
+if($opt_db) { $opt_db = abs_path($opt_db); }
 
 #-- Override settings if running on lowmem or MinION mode.
 if($lowmem) { $blocksize=3; $canumem=15; }
@@ -179,7 +179,7 @@ if($minion) { $assembler="canu"; $mapper="minimap2-ont"; }
 
 my($dietext,$finaltrace);
 if($ver) { print "$version\n"; exit; }
-if($hel) { die "$helptext\n"; } 
+if($hel) { die "$helptext\n"; }
 if(!$rawfastq) { $dietext.="MISSING ARGUMENT: -f|-seq: Fastq read files' directory\n"; }
 if(!$equivfile) { $dietext.="MISSING ARGUMENT: -s|-samples: Samples file\n"; }
 if(!$mode) { $dietext.="MISSING ARGUMENT: -m: Run mode (sequential, coassembly, merged)\n"; }
@@ -189,11 +189,13 @@ if($mode!~/sequential|coassembly|merged|seqmerge/i) { $dietext.="UNRECOGNIZED mo
 if($mapper!~/bowtie|bwa|minimap2-ont|minimap2-pb|minimap2-sr/i) { $dietext.="UNRECOGNIZED mapper $mapper (valid ones are bowtie, bwa, minimap2-ont, minimap2-pb or minimap2-sr\n"; }
 if($assembler!~/megahit|spades|canu|flye/i) { $dietext.="UNRECOGNIZED assembler $assembler (valid ones are megahit, spades, canu or flye)\n"; }
 if(($assembler=~/flye/i) && ($mode=~/merge/i)) { $dietext.="Invalid combination of mode and assembler\n (We are sorry for this, the low number of contigs provided by Flye prevents minimus2 needed in $mode mode to work correctly\n Please use coassembly, or a different assembler)\n"; }
-# if($rawfastq=~/^\//) {} else { $rawfastq=abs_path($rawfastq); }
+if($rawfastq=~/^\//) {} else { $rawfastq=abs_path($rawfastq); }
 if($dietext) { print BOLD "$helpshort"; print RESET; print RED; print "$dietext"; print RESET;  die; }
 
-# $projectdir = abs_path($projectdir);
-$projectname = (split '/', $projectdir)[-1];
+$projectdir = abs_path($projectdir);
+print "Project directory is set as $projectdir"
+
+# $projectname = (split '/', $projectdir)[-1];
 my $syslogfile="$projectdir/syslog";
 
 	#-- Check that everything is correct in the samples file
@@ -212,7 +214,7 @@ while(<infile1>) {
 	if(-e "$rawfastq/$file") {} else { print RED; print "Can't find sample file $rawfastq/$file for sample $sample in the samples file. Please check\n"; print RESET;  die; }
 }
 close infile1;
-foreach my $chsam(keys %pairsample) { 
+foreach my $chsam(keys %pairsample) {
 	if($pairsample{$chsam}!~/pair1/) { print RED; print "Sample $chsam has not pair1 in the samples file. Please check\n"; print RESET;  die; }
 	}
 
@@ -225,7 +227,7 @@ print "Run started ",scalar localtime," in $mode mode\n";
 #--------------------------------------------------------------------------------------------------
 #----------------------------------- SEQUENTIAL MODE ----------------------------------------------
 
-if($mode=~/sequential/i) { 
+if($mode=~/sequential/i) {
 
 	my(%allsamples,%ident,%noassembly);
 	my($sample,$file,$iden,$mapreq);
@@ -254,7 +256,7 @@ if($mode=~/sequential/i) {
 	open(outfile2,">$pwd/syslog") || do { print RED; print "Can't write in directory $pwd\n"; print RESET; die; }; 		 #-- A log file for the global proccess
 	print outfile2 "\nSqueezeMeta v$version - (c) J. Tamames, F. Puente-Sánchez CNB-CSIC, Madrid, SPAIN\n\nPlease cite: Tamames & Puente-Sanchez, Frontiers in Microbiology 10.3389 (2019). doi: https://doi.org/10.3389/fmicb.2018.03349\n\n";
 	print outfile2 "Run started ",scalar localtime," in SEQUENTIAL mode (it will proccess all metagenomes sequentially)\n";
-	print outfile2 "Command: $commandline\n"; 
+	print outfile2 "Command: $commandline\n";
 	print outfile2 "Options: threads=$numthreads; contiglen=$mincontiglen; assembler=$assembler; sample file=$equivfile; raw fastq=$rawfastq\n";
 
 	#-- Now we start processing each sample individually
@@ -267,7 +269,7 @@ if($mode=~/sequential/i) {
 		my $projectdir="$pwd/$thissample";
 		if (-d $projectdir) { print RED; print "Project name $projectdir already exists. Please remove it or change the project name\n"; print RESET; die; } else { system("mkdir $projectdir"); }
 		print "Working with $thissample\n";
-	
+
 		open(outfile3,">$projectdir/progress") or do { print RED; print "Can't write in directory $projectdir. Wrong permissions, or out of space?\n"; print RESET; die; };  #-- An index indicating where are we and which parts of the method finished already. For the global process
 		open(outfile4,">$projectdir/syslog")  or do { print RED; print "Can't write in directory $projectdir. Wrong permissions, or out of space?\n"; print RESET; die; }; 	#-- A log file for the global proccess
 		$currtime=timediff();
@@ -280,22 +282,22 @@ if($mode=~/sequential/i) {
 		print outfile4 "Project: $projectname\n";
 		print outfile4 "Map file: $equivfile\n";
 		print outfile4 "Fastq directory: $rawfastq\n";
-		print outfile4 "Command: $commandline\n"; 
+		print outfile4 "Command: $commandline\n";
 		print outfile4 "[",$currtime->pretty,"]: STEP0 -> SqueezeMeta.pl\n";
 		if(!$nocog) { print outfile4 " COGS;"; }
 		if(!$nokegg) { print outfile4 " KEGG;"; }
 		if(!$nopfam) { print outfile4 " PFAM;"; }
 		if($opt_db) { print outfile4 " EXT_DB: $opt_db;"; }
-		if($euknofilter) { print outfile4 " EUKNOFILTER;"; } 
+		if($euknofilter) { print outfile4 " EUKNOFILTER;"; }
 		if($doublepass) { print outfile4 " DOUBLEPASS;"; }
 		if($lowmem) { print outfile4 " LOW MEMORY MODE;"; }
 		print outfile4 "\n";
 		print outfile2 "[",$currtime->pretty,"]: STEP0 -> SqueezeMeta.pl\n";
 		print "Now creating directories\n";
 		open(infile2,"$scriptdir/SqueezeMeta_conf.pl") or do { print RED; print "Can't open conf file $scriptdir/SqueezeMeta_conf.pl\n"; print RESET; die; };
-	
+
 		#-- Creation of the new configuration file for this sample
-	
+
 		open(outfile5,">$projectdir/SqueezeMeta_conf.pl") or do { print RED; print "Can't write in directory $projectdir. Out of space?\n"; print RESET; die; };
 
 		print outfile5 "\$mode = \"$mode\";\n\n";
@@ -322,7 +324,7 @@ if($mode=~/sequential/i) {
 			if($consensus) { print outfile5 "\$consensus=$consensus;\n"; }
 			elsif($minion) { print outfile5 "\$consensus=0.2;\n"; }
 		}
-	 	close infile2; 
+	 	close infile2;
 
 		print outfile5 "\n#-- Options\n\n";
 		print outfile5 "\$numthreads         = $numthreads;\n";
@@ -335,25 +337,25 @@ if($mode=~/sequential/i) {
 		close outfile5;
 
 		#-- Creation of directories
- 
+
 		print "Reading configuration from $projectdir/SqueezeMeta_conf.pl\n";
 		do "$projectdir/SqueezeMeta_conf.pl";
 		system ("mkdir $datapath");
  		system ("mkdir $resultpath");
  		system ("mkdir $tempdir");
- 		system ("mkdir $datapath/raw_fastq"); 
- 		system ("mkdir $extpath"); 
+ 		system ("mkdir $datapath/raw_fastq");
+ 		system ("mkdir $extpath");
 		system ("mkdir $interdir");
 		open(outmet,">$methodsfile") || warn "Cannot open methods file $methodsfile for writing methods and references\n";
 		print outmet "Analysis done with SqueezeMeta v$version (Tamames & Puente-Sanchez 2019, Frontiers in Microbiology 9, 3349)\n";
 		close outmet;
 
-	
+
 		#-- Linkage of files to put them into our data directories
-	
+
 		print "Now linking read files\n";
  		foreach my $file(sort keys %{ $allsamples{$thissample} }) {
- 			 if(-e "$rawfastq/$file") { 
+ 			 if(-e "$rawfastq/$file") {
   				my $tufile="$datapath/raw_fastq/$file";
  				# system("cp $rawfastq/$file $tufile");
  				 system("ln -s $rawfastq/$file $tufile");
@@ -376,14 +378,14 @@ if($mode=~/sequential/i) {
 	# system("cp $equivfile $mappingfile");
 	if((!$miniden) && (!$evalue)) { system("cp $scriptdir/parameters.pl $projectdir"); }
 	else {
-		open(outpar,">$projectdir/parameters.pl") || die "Cannot create new parameter file in $projectdir/parameters.pl\n"; 
-		open(inpar,"$scriptdir/parameters.pl") || die "Cannot open parameter file in $scriptdir/parameters.pl\n"; 
+		open(outpar,">$projectdir/parameters.pl") || die "Cannot create new parameter file in $projectdir/parameters.pl\n";
+		open(inpar,"$scriptdir/parameters.pl") || die "Cannot open parameter file in $scriptdir/parameters.pl\n";
 		while(<inpar>) {
-			if($miniden && ($_=~/^\$miniden.*?\=(\d+)/)) { 
+			if($miniden && ($_=~/^\$miniden.*?\=(\d+)/)) {
 				$_=~s/$1/$miniden/;
 				print outpar $_;
 				}
-			elsif($evalue && ($_=~/^\$evalue.*?\=([^;]+)/)) { 
+			elsif($evalue && ($_=~/^\$evalue.*?\=([^;]+)/)) {
 				$_=~s/$1/$evalue/;
 				print outpar $_;
 				}
@@ -392,7 +394,7 @@ if($mode=~/sequential/i) {
 		close inpar;
 		close outpar;
 		}
-	
+
 		}
 
 		#-- Preparing the files for the assembly, merging all files corresponding to each pair
@@ -405,36 +407,36 @@ if($mode=~/sequential/i) {
  			next if($noassembly{$afiles});
   			my $gzfiles=$afiles;
   			#if($gzfiles!~/gz$/) { $gzfiles.=".gz"; }
- 			if($ident{$thissample}{$afiles} eq "pair1") { $ca1.="$datapath/raw_fastq/$gzfiles "; $par1files++; } 
-			else { $ca2.="$datapath/raw_fastq/$gzfiles "; $par2files++; } 
+ 			if($ident{$thissample}{$afiles} eq "pair1") { $ca1.="$datapath/raw_fastq/$gzfiles "; $par1files++; }
+			else { $ca2.="$datapath/raw_fastq/$gzfiles "; $par2files++; }
 			if($gzfiles=~/gz$/) { $par1name="$datapath/raw_fastq/par1.fastq.gz"; $par2name="$datapath/raw_fastq/par2.fastq.gz"; }  # Fixed bug 30/10/2018 JT
 			else { $par1name="$datapath/raw_fastq/par1.fastq"; $par2name="$datapath/raw_fastq/par2.fastq"; }
 		}
 		if(!$par1files) { print RED; print "There must be at least one 'pair1' sequence file in your samples file $mappingfile, and there is none!\n"; print RESET; die;  }
-		if($par1files>1) { 
-			my $command="cat $ca1 > $par1name"; 
-			#print "$command\n"; 
-			system($command); 
-		} 
+		if($par1files>1) {
+			my $command="cat $ca1 > $par1name";
+			#print "$command\n";
+			system($command);
+		}
 		else {
-			#my $command="cp $ca1 $par1name"; 
+			#my $command="cp $ca1 $par1name";
 			my $command="ln -s $ca1 $par1name";
 			#print "$command\n";
 			system($command);
- 
+
 		}
- 		if($par2files>1) { system("cat $ca2 > $par2name"); } 
+ 		if($par2files>1) { system("cat $ca2 > $par2name"); }
 		elsif ($par2files==1) { system("ln -s $ca2 $par2name"); }    #-- Support for single reads
-	
+
 		#else { system("cp $ca2 $par2name"); }
 		#-- CALL TO THE STANDARD PIPELINE
-		
+
 		pipeline();
-		
-		
+
+
  		close outfile4;		#-- Closing log file for the sample
  		close outfile3;		#-- Closing progress file for the sample
-							       
+
 	}    #-- End of this sample, go for the next
 
 }            #-- END
@@ -448,7 +450,7 @@ else {
 	if (-d $projectdir) {
 		print RED;
 		print "Project name $projectdir already exists. Please remove it or change project name\n";
-		print RESET; 
+		print RESET;
 		die;
 	}else{
 		my $ecode = system("mkdir $projectdir");
@@ -459,7 +461,7 @@ else {
 			die;
 		}
 	}
-		
+
 	#-- We start creating directories, progress and log files
 
 	open(outfile3,">$projectdir/progress") or do { print RED; print "Can't write in $projectdir. Wrong permissions, or out of space?\n"; print RESET; die; }; #-- Un indice que indica en que punto estamos (que procedimientos han terminado)
@@ -467,7 +469,7 @@ else {
 	my $params = join(" ", @ARGV);
 	print outfile4 "\nSqueezeMeta v$version - (c) J. Tamames, F. Puente-Sánchez CNB-CSIC, Madrid, SPAIN\n\nPlease cite: Tamames & Puente-Sanchez, Frontiers in Microbiology 10.3389 (2019). doi: https://doi.org/10.3389/fmicb.2018.03349\n\n";
 	print outfile4 "Run started ",scalar localtime," in $mode mode\n";
-	print outfile4 "Command: $commandline\n"; 
+	print outfile4 "Command: $commandline\n";
 	print outfile4 "Project: $projectname\n";
 	print outfile4 "Map file: $equivfile\n";
 	print outfile4 "Fastq directory: $rawfastq\n";
@@ -476,14 +478,14 @@ else {
 	if(!$nokegg) { print outfile4 " KEGG;"; }
 	if(!$nopfam) { print outfile4 " PFAM;"; }
 	if($opt_db) { print outfile4 " EXT_DB: $opt_db;"; }
-	if($euknofilter) { print outfile4 " EUKNOFILTER;"; } 
+	if($euknofilter) { print outfile4 " EUKNOFILTER;"; }
 	if($doublepass) { print outfile4 " DOUBLEPASS;"; }
 	if($lowmem) { print outfile4 " LOW MEMORY;"; }
 	print outfile4 "\n";
 	print outfile4 "[",$currtime->pretty,"]: STEP0 -> SqueezeMeta.pl\n";
 
 	print "Now creating directories\n";
-	
+
 	#-- Creation of the new configuration file for this sample
 	open(infile3,"$scriptdir/SqueezeMeta_conf.pl") or do { print RED; print "Can't open $scriptdir/SqueezeMeta_conf.pl\n"; print RESET; die; };
 	open(outfile6,">$projectdir/SqueezeMeta_conf.pl") or do { print RED; print "Can't write in directory $projectdir. Wrong permissions, or out of space?\n"; print RESET; die; };
@@ -531,22 +533,22 @@ else {
 	close outmet;
 
 	#-- Creation of directories
-	
+
 	system ("mkdir $datapath");
 	system ("mkdir $resultpath");
 	system ("mkdir $tempdir");
-	system ("mkdir $datapath/raw_fastq"); 
- 	system ("mkdir $extpath"); 
+	system ("mkdir $datapath/raw_fastq");
+ 	system ("mkdir $extpath");
 	system ("mkdir $interdir");
- 
+
 	#-- Preparing the files for the assembly
-	   
+
 	moving();
-	
+
 	#-- CALL TO THE STANDARD PIPELINE
-	
+
 	pipeline();
-	
+
 	close outfile4;  #-- Closing log file for the sample
 	close outfile3;	  #-- Closing progress file for the sample
 
@@ -556,9 +558,9 @@ else {
 #----------------------------PREPARING FILES FOR MERGING AND COASSEMBLY MODES-------------------------------------------
 
 sub moving {
-	
+
 	#-- Reading samples from the file specified with -s option
-	
+
 	my(%allsamples,%ident,%noassembly);
 	open(infile4,$equivfile) or do { print RED; print "Can't open samples file (-s) in $equivfile. Please check if that is the correct file, it is present tin that location, and you have reading permissions\n"; print RESET; die; };
 	while(<infile4>) {
@@ -569,7 +571,7 @@ sub moving {
 		$allsamples{$sample}=1;
 		$ident{$file}=$iden;
 		if(($mapreq) && ($mapreq=~/noassembly/i)) { $noassembly{$file}=1; }    #-- Files flagged for no assembly (but they will be mapped)
-		if(-e "$rawfastq/$file") { 
+		if(-e "$rawfastq/$file") {
 			my $tufile="$datapath/raw_fastq/$file";
 			# system("cp $rawfastq/$file $tufile");
 			system("ln -s $rawfastq/$file $tufile");
@@ -589,27 +591,27 @@ sub moving {
 	else { print "$numsamples samples found: @nmg\n\n"; }
 
 	open(infile0,$equivfile) || die;	#-- Deleting \r in samples file for windows compatibility
-	open(outfile0,">$mappingfile") || die;  
+	open(outfile0,">$mappingfile") || die;
 	while(<infile0>) {
 		$_=~s/\r//g;
 		print outfile0 $_;
 		}
 	close outfile0;
 	close infile0;
-	
+
 	#-- Adjusting parameters.pl file for custom identity and evalue
-	
+
 	# system("cp $equivfile $mappingfile");
 	if((!$miniden) && (!$evalue)) { system("cp $scriptdir/parameters.pl $projectdir"); }
 	else {
-		open(outpar,">$projectdir/parameters.pl") || die "Cannot create new parameter file in $projectdir/parameters.pl\n"; 
-		open(inpar,"$scriptdir/parameters.pl") || die "Cannot open parameter file in $scriptdir/parameters.pl\n"; 
+		open(outpar,">$projectdir/parameters.pl") || die "Cannot create new parameter file in $projectdir/parameters.pl\n";
+		open(inpar,"$scriptdir/parameters.pl") || die "Cannot open parameter file in $scriptdir/parameters.pl\n";
 		while(<inpar>) {
-			if($miniden && ($_=~/^\$miniden.*?\=(\d+)/)) { 
+			if($miniden && ($_=~/^\$miniden.*?\=(\d+)/)) {
 				$_=~s/$1/$miniden/;
 				print outpar $_;
 				}
-			elsif($evalue && ($_=~/^\$evalue.*?\=([^;]+)/)) { 
+			elsif($evalue && ($_=~/^\$evalue.*?\=([^;]+)/)) {
 				$_=~s/$1/$evalue/;
 				print outpar $_;
 				}
@@ -630,9 +632,9 @@ sub moving {
 			# if($gzfiles!~/gz$/) { $gzfiles.=".gz"; }
 			if($gzfiles=~/gz$/) { $par1name="$datapath/raw_fastq/par1.fastq.gz"; $par2name="$datapath/raw_fastq/par2.fastq.gz"; }
 			else { $par1name="$datapath/raw_fastq/par1.fastq"; $par2name="$datapath/raw_fastq/par2.fastq"; }
-			if($ident{$afiles} eq "pair1") { $ca1.="$datapath/raw_fastq/$gzfiles "; $par1files++; } else { $ca2.="$datapath/raw_fastq/$gzfiles "; $par2files++; } 
+			if($ident{$afiles} eq "pair1") { $ca1.="$datapath/raw_fastq/$gzfiles "; $par1files++; } else { $ca2.="$datapath/raw_fastq/$gzfiles "; $par2files++; }
 		}
-  
+
 		if(!$par1files) { print RED; print "There must be at least one 'pair1' sequence file in your samples file $mappingfile, and there is none!\n"; print RESET; die; }
 		print outfile4 "Merging files for coassembly: ";
 		if($par1files>1) { system("cat $ca1 > $par1name"); print outfile4 "cat $ca1 > $par1name; "; } else { system("ln -s $ca1 $par1name"); print outfile4 "ln -s $ca1 $par1name; "; }
@@ -668,7 +670,7 @@ sub pipeline {
 		my $scriptname="01.run_assembly.pl";
 		print outfile3 "1\t$scriptname ($assembler)\n";
 		$currtime=timediff();
-		print outfile4 "\n[",$currtime->pretty,"]: STEP1 -> $scriptname ($assembler)\n"; 
+		print outfile4 "\n[",$currtime->pretty,"]: STEP1 -> $scriptname ($assembler)\n";
 		print BLUE "[",$currtime->pretty,"]: STEP1 -> RUNNING CO-ASSEMBLY: $scriptname ($assembler)\n"; print RESET;
 		if($longtrace) { print " (This will take all the metagenomes and assemble them together using $assembler as assembler)\n"; }
 		my $ecode = system("perl $scriptdir/$scriptname $projectdir");
@@ -705,10 +707,10 @@ sub pipeline {
 			my $ecode = system("perl $scriptdir/$scriptname $projectdir");
 	                if($ecode!=0)	{ error_out(1,$scriptname); }
 			}
-	
-			#-- Merging individual assemblies 
+
+			#-- Merging individual assemblies
 			#-- We still do it in $extassembly for computing contig lengths and prinseq stuff
- 
+
 		my $scriptname;
 		if($mode eq "merged") { $scriptname="01.merge_assemblies.pl"; }
 		elsif($mode eq "seqmerge") { $scriptname="01.merge_sequential.pl"; }
@@ -736,8 +738,8 @@ sub pipeline {
 		}
 		if($wsize<2)         { error_out(1.5,$scriptname,$contigsfna); }
 	}
-	
-		#-- In sequential mode. 
+
+		#-- In sequential mode.
 
 	elsif($mode=~/sequential/) {
 		my $scriptname="01.run_assembly.pl";
@@ -761,12 +763,12 @@ sub pipeline {
                 	my $ecode = system("perl $scriptdir/$scriptname $projectdir");
                 	if($ecode!=0)        { print RED; print "Stopping in STEP1 -> $scriptname ($assembler)\n"; print RESET; die; }
                 	my $wc=qx(wc -l $contigsfna);
-                	my($wsize,$rest)=split(/\s+/,$wc);		
+                	my($wsize,$rest)=split(/\s+/,$wc);
 			if($wsize<2)	{ error_out(1,$scriptname,$contigsfna); }
 			}
 		}
 	close(outfile4); open(outfile4,">>$syslogfile");
-			
+
     #-------------------------------- STEP2: Run RNA prediction
 
 	if(($rpoint<=2) && ((!$test) || ($test>=2))) {
@@ -783,12 +785,12 @@ sub pipeline {
 		my $wc=qx(wc -l $masked);
 		my($wsize,$rest)=split(/\s+/,$wc);
 		if($wsize<2)    { error_out(2,$scriptname,$masked); }
-		close(outfile4); open(outfile4,">>$syslogfile");	
+		close(outfile4); open(outfile4,">>$syslogfile");
 	}
-			
+
     #-------------------------------- STEP3: Run gene prediction
 
-	if(($rpoint<=3) && ((!$test) || ($test>=3))) { 
+	if(($rpoint<=3) && ((!$test) || ($test>=3))) {
 		my $scriptname="03.run_prodigal.pl";
  		print outfile3 "3\t$scriptname\n";
  		$currtime=timediff();
@@ -802,7 +804,7 @@ sub pipeline {
 		if($wsize<2)    { error_out(3,$scriptname,$aafile); }
 		close(outfile4); open(outfile4,">>$syslogfile");
 	}
-			
+
     #-------------------------------- STEP4: Run Diamond for taxa and functions
 
 	if(($rpoint<=4) && ((!$test) || ($test>=4))) {
@@ -820,7 +822,7 @@ sub pipeline {
 		if($wsize<1)    { error_out(4,$scriptname,$taxdiamond); }
 		close(outfile4); open(outfile4,">>$syslogfile");
 	}
-			
+
     #-------------------------------- STEP5: Run hmmer for PFAM annotation
 
 	if(($rpoint<=5) && ((!$test) || ($test>=5))) {
@@ -832,14 +834,14 @@ sub pipeline {
 			print BLUE "[",$currtime->pretty,"]: STEP5 -> HMMER/PFAM: $scriptname\n"; print RESET;
 			if($longtrace) { print " (This will take all ORFs and run HMMER searches against the PFAM database, for increased sensitivity in predicting protein families. This step is likely to be slow)\n"; }
 			my $ecode = system("perl $scriptdir/$scriptname $projectdir");
-			if($ecode!=0)        { error_out(5,$scriptname); }			
+			if($ecode!=0)        { error_out(5,$scriptname); }
 			my $wc=qx(wc -l $pfamhmmer);
 			my($wsize,$rest)=split(/\s+/,$wc);
 			if($wsize<4)    { error_out(5,$scriptname,$pfamhmmer); }
 		}
-	outfile4->autoflush;		
+	outfile4->autoflush;
 	}
-			
+
     #-------------------------------- STEP6: LCA algorithm for taxa annotation
 
 	if(($rpoint<=6) && ((!$test) || ($test>=6))) {
@@ -854,9 +856,9 @@ sub pipeline {
 		my $wc=qx(wc -l "$fun3tax.wranks");
 		my($wsize,$rest)=split(/\s+/,$wc);
 		if($wsize<2)    { error_out(6,$scriptname,$pfamhmmer); }
-		close(outfile4); open(outfile4,">>$syslogfile");		
+		close(outfile4); open(outfile4,">>$syslogfile");
 	}
-			
+
     #-------------------------------- STEP7: fun3 for COGs, KEGG and PFAM annotation
 
 	if(($rpoint<=7) && ((!$test) || ($test>=7))) {
@@ -884,7 +886,7 @@ sub pipeline {
 				}
 			my $optdbsw;
 			if($opt_db) {
-				open(infile0,$opt_db) || warn "Can't open EXTDB file $opt_db\n"; 
+				open(infile0,$opt_db) || warn "Can't open EXTDB file $opt_db\n";
 				while(<infile0>) {
 					my($dbname,$extdb,$dblist)=split(/\t/,$_);
 					my $wc=qx(wc -l $resultpath/07.$projectname.fun3.$dbname);
@@ -897,9 +899,9 @@ sub pipeline {
 		}
 	close(outfile4); open(outfile4,">>$syslogfile");
 	}
-			
+
     #-------------------------------- STEP8: Blastx on the unannotated parts of the contigs
-	
+
 	if(($rpoint<=8) && ((!$test) || ($test>=8))) {
 		if($doublepass) {
 			my $scriptname="08.blastx.pl";
@@ -917,7 +919,7 @@ sub pipeline {
 			}
 	close(outfile4); open(outfile4,">>$syslogfile");
 	}
-		
+
 
     #-------------------------------- STEP9: Taxonomic annotation for the contigs (consensus of gene annotations)
 
@@ -936,9 +938,9 @@ sub pipeline {
 		if($wsize<2)         { error_out(9,$scriptname,$alllog); }
 		close(outfile4); open(outfile4,">>$syslogfile");
 	}
-			
+
     #-------------------------------- STEP10: Mapping of reads onto contigs for abundance calculations
-	
+
 	if(($rpoint<=10) && ((!$test) || ($test>=10))) {
 		my $scriptname="10.mapsamples.pl";
 		print outfile3 "10\t$scriptname\n";
@@ -953,9 +955,9 @@ sub pipeline {
 		if($wsize<3)         { error_out(10,$scriptname,$mapcountfile); }
 		close(outfile4); open(outfile4,">>$syslogfile");
 	}
-			
+
     #-------------------------------- STEP11: Count of taxa abundances
-	
+
 	if(($rpoint<=11) && ((!$test) || ($test>=11))) {
 		my $scriptname="11.mcount.pl";
 		print outfile3 "11\t$scriptname\n";
@@ -968,11 +970,11 @@ sub pipeline {
 		my $wc=qx(wc -l $mcountfile);
 		my($wsize,$rest)=split(/\s+/,$wc);
 		if($wsize<2)         { error_out(11,$scriptname,$mcountfile); }
-		close(outfile4); open(outfile4,">>$syslogfile");		
+		close(outfile4); open(outfile4,">>$syslogfile");
 	}
-			
+
     #-------------------------------- STEP12: Count of function abundances
-	
+
 	if(($rpoint<=12) && ((!$test) || ($test>=12))) {
 		my $scriptname="12.funcover.pl";
 		if((!$nocog) || (!$nokegg) || ($opt_db)) {
@@ -993,9 +995,9 @@ sub pipeline {
 		}
 		close(outfile4); open(outfile4,">>$syslogfile");
 	}
-			
+
     #-------------------------------- STEP13: Generation of the gene table
-		
+
 	if(($rpoint<=13) && ((!$test) || ($test>=13))) {
 		my $scriptname="13.mergeannot2.pl";
 		print outfile3 "13\t$scriptname\n";
@@ -1011,11 +1013,11 @@ sub pipeline {
 		if($longtrace) { print " (Now we already have a GENE TABLE)\n"; }
 		close(outfile4); open(outfile4,">>$syslogfile");
 	}
-			
-    #-------------------------------- STEP14: Running Maxbin (only for merged or coassembly modes)		
-	
-	 if(!$nobins) {	     
-	 	if($longtrace) { print " (Now we will start creating bins for separating individual organisms in the community)\n"; }  
+
+    #-------------------------------- STEP14: Running Maxbin (only for merged or coassembly modes)
+
+	 if(!$nobins) {
+	 	if($longtrace) { print " (Now we will start creating bins for separating individual organisms in the community)\n"; }
 		if(($rpoint<=14) && (!$nomaxbin) && ((!$test) || ($test>=14))) {
 			my $scriptname="14.bin_maxbin.pl";
 			print outfile3 "14\t$scriptname\n";
@@ -1037,11 +1039,11 @@ sub pipeline {
 				}
 			else { $wsize==0; }
 			if($wsize<2) { print RED; print "WARNING in STEP14 -> $scriptname. No MaxBin results!\n"; print RESET; $finaltrace.="WARNING in STEP15: No Maxbin results!\n"; }
-			close(outfile4); open(outfile4,">>$syslogfile");		
+			close(outfile4); open(outfile4,">>$syslogfile");
 		}
-			
-    #-------------------------------- STEP15: Running Metabat (only for merged or coassembly modes)		
-	
+
+    #-------------------------------- STEP15: Running Metabat (only for merged or coassembly modes)
+
 		if(($rpoint<=15) && (!$nometabat) && ((!$test) || ($test>=15))) {
 			my $scriptname="15.bin_metabat2.pl";
 			print outfile3 "15\t$scriptname\n";
@@ -1065,9 +1067,9 @@ sub pipeline {
 			if($wsize<2) { print RED; print "WARNING in STEP15 -> $scriptname. No Metabat2 results!\n"; print RESET; $finaltrace.="WARNING in STEP15: No Metabat2 results!\n";  }
 			close(outfile4); open(outfile4,">>$syslogfile");
 		}
- 
-    #-------------------------------- STEP16: DAS Tool merging of binning results	
-	
+
+    #-------------------------------- STEP16: DAS Tool merging of binning results
+
 		if(($rpoint<=16) && ((!$test) || ($test>=16))) {
 			my $scriptname="16.dastool.pl";
 			print outfile3 "16\t$scriptname\n";
@@ -1096,9 +1098,9 @@ sub pipeline {
 				}
 			close(outfile4); open(outfile4,">>$syslogfile");
 		}
-			
-    #-------------------------------- STEP17: Taxonomic annotation for the bins (consensus of contig annotations)		
-	
+
+    #-------------------------------- STEP17: Taxonomic annotation for the bins (consensus of contig annotations)
+
 		if(($rpoint<=17) && ((!$test) || ($test>=17))) {
 			if(!$DAS_Tool_empty){
 				my $scriptname="17.addtax2.pl";
@@ -1117,9 +1119,9 @@ sub pipeline {
 			close(outfile4); open(outfile4,">>$syslogfile");
 		}
 
-			
-    #-------------------------------- STEP18: Checking of bins for completeness and contamination (checkM)		
-	
+
+    #-------------------------------- STEP18: Checking of bins for completeness and contamination (checkM)
+
 		if(($rpoint<=18) && ((!$test) || ($test>=18))) {
 			if(!$DAS_Tool_empty){
 				my $scriptname="18.checkM_batch.pl";
@@ -1141,9 +1143,9 @@ sub pipeline {
 			close(outfile4); open(outfile4,">>$syslogfile");
 		}
 
-			
-    #-------------------------------- STEP19: Make bin table		
-	
+
+    #-------------------------------- STEP19: Make bin table
+
 		if(($rpoint<=19) && ((!$test) || ($test>=19))) {
 			if(!$DAS_Tool_empty){
 				my $scriptname="19.getbins.pl";
@@ -1164,7 +1166,7 @@ sub pipeline {
 		close(outfile4); open(outfile4,">>$syslogfile");
 	 }
 
-    #-------------------------------- STEP20: Make contig table		
+    #-------------------------------- STEP20: Make contig table
 
 	if(($rpoint<=20) && ((!$test) || ($test>=20))) {
 		my $scriptname="20.getcontigs.pl";
@@ -1182,9 +1184,9 @@ sub pipeline {
 		close(outfile4); open(outfile4,">>$syslogfile");
 	}
 
-    #-------------------------------- STEP21: Pathways in bins          
+    #-------------------------------- STEP21: Pathways in bins
 
-	if(!$nobins) {	       
+	if(!$nobins) {
 		if(($rpoint<=21) && ((!$test) || ($test>=21))) {
 			if((!$DAS_Tool_empty) && (!$nokegg)) {
 				my $scriptname="21.minpath.pl";
@@ -1206,7 +1208,7 @@ sub pipeline {
 	}
 
 
-    #-------------------------------- STEP22: Make stats		
+    #-------------------------------- STEP22: Make stats
 
 	if($rpoint<=22) {
 		my $scriptname="22.stats.pl";
@@ -1224,14 +1226,14 @@ sub pipeline {
 		close(outfile4); open(outfile4,">>$syslogfile");
 	}
 
-    #-------------------------------- END OF PIPELINE		
+    #-------------------------------- END OF PIPELINE
 
 	print outfile3 "END\n";
 	$currtime=timediff();
 	print "\nDeleting temporary files in $tempdir\n";
 	print outfile4 "\nDeleting temporary files in $tempdir\n";
 	# system("rm -r $tempdir/*");
-	if(-e "$datapath/megahit/final.contigs.fa") { system("rm -r $datapath/megahit/intermediate_contigs; rm $datapath/megahit/final.contigs.fa"); } 
+	if(-e "$datapath/megahit/final.contigs.fa") { system("rm -r $datapath/megahit/intermediate_contigs; rm $datapath/megahit/final.contigs.fa"); }
 	print outfile4 "\n[",$currtime->pretty,"]: FINISHED -> Have fun!\n";
 	print BLUE "[",$currtime->pretty,"]: FINISHED -> Have fun!\n"; print RESET;
 	if($finaltrace) { print "\nWARNINGS:\n$finaltrace\n"; }
@@ -1240,7 +1242,7 @@ sub pipeline {
 
 
 sub error_out {
-	outfile4->autoflush;		
+	outfile4->autoflush;
 	my($step,$scriptname,$file)=@_;
 	if($file) { print RED; print "Stopping in STEP$step -> $scriptname. File $file is empty!\n"; print RESET; print outfile4 "Stopping in STEP$step -> $scriptname. File $file is empty!\n"; }
 	else { print RED; print "Stopping in STEP$step -> $scriptname. Program finished abnormally\n"; print RESET; print outfile4 "Stopping in STEP$step -> $scriptname. Program finished abnormally\n"; }
@@ -1254,4 +1256,3 @@ sub error_out {
 	print RESET;
 	die;
 }
-
