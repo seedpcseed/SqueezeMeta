@@ -28,13 +28,17 @@ if(-l __FILE__)
 	{
 	my $symlinkpath = dirname(__FILE__);
         my $symlinkdest = readlink(__FILE__);
-        $scriptdir = dirname(abs_path("$symlinkpath/$symlinkdest"));
+	 $scriptdir = dirname("$symlinkpath/$symlinkdest");
+#        $scriptdir = dirname(abs_path("$symlinkpath/$symlinkdest"));
         }
 else
 	{
-	$scriptdir = abs_path(dirname(__FILE__));
+	# $scriptdir = abs_path(dirname(__FILE__));
+	$scriptdir = dirname(__FILE__);
 	}
-our $installpath = abs_path("$scriptdir/..");
+our $installpath = "$scriptdir/..";
+# our $installpath = abs_path("$scriptdir/..");
+
 ###
 
 our $pwd=cwd();
@@ -163,7 +167,7 @@ if(!$cleaning) { $cleaning=0; $cleaningoptions=""; }
 if($consensus) { $consensus/=100; }
 
 $mode=~tr/A-Z/a-z/;
-if($opt_db) { $opt_db = abs_path($opt_db); }
+# if($opt_db) { $opt_db = abs_path($opt_db); }
 
 #-- Override settings if running on lowmem or MinION mode.
 if($lowmem) { $blocksize=3; $canumem=15; }
@@ -185,10 +189,10 @@ if($mode!~/sequential|coassembly|merged|seqmerge/i) { $dietext.="UNRECOGNIZED mo
 if($mapper!~/bowtie|bwa|minimap2-ont|minimap2-pb|minimap2-sr/i) { $dietext.="UNRECOGNIZED mapper $mapper (valid ones are bowtie, bwa, minimap2-ont, minimap2-pb or minimap2-sr\n"; }
 if($assembler!~/megahit|spades|canu|flye/i) { $dietext.="UNRECOGNIZED assembler $assembler (valid ones are megahit, spades, canu or flye)\n"; }
 if(($assembler=~/flye/i) && ($mode=~/merge/i)) { $dietext.="Invalid combination of mode and assembler\n (We are sorry for this, the low number of contigs provided by Flye prevents minimus2 needed in $mode mode to work correctly\n Please use coassembly, or a different assembler)\n"; }
-if($rawfastq=~/^\//) {} else { $rawfastq=abs_path($rawfastq); }
+# if($rawfastq=~/^\//) {} else { $rawfastq=abs_path($rawfastq); }
 if($dietext) { print BOLD "$helpshort"; print RESET; print RED; print "$dietext"; print RESET;  die; }
 
-$projectdir = abs_path($projectdir);
+# $projectdir = abs_path($projectdir);
 $projectname = (split '/', $projectdir)[-1];
 my $syslogfile="$projectdir/syslog";
 
