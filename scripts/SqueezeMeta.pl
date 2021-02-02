@@ -356,9 +356,9 @@ if($mode=~/sequential/i) {
  		foreach my $file(sort keys %{ $allsamples{$thissample} }) {
  			 if(-e "$rawfastq/$file") {
   				my $tufile="$datapath/raw_fastq/$file";
- 				# system("cp $rawfastq/$file $tufile");
+ 				 system("cp $rawfastq/$file $tufile");
  				 system("ln -s $rawfastq/$file $tufile");
- 				# if($tufile!~/\.gz$/) { system("gzip $datapath/raw_fastq/$file"); }
+ 				 if($tufile!~/\.gz$/) { system("gzip $datapath/raw_fastq/$file"); }
 			}
  			 else { print RED; print "Can't find read file $file (Sample $sample). Please check if it exists\n"; print RESET; die; }
 
@@ -374,7 +374,7 @@ if($mode=~/sequential/i) {
 
 	#-- Adjusting parameters.pl file for custom identity and evalue
 
-	# system("cp $equivfile $mappingfile");
+	system("cp $equivfile $mappingfile");
 	if((!$miniden) && (!$evalue)) { system("cp $scriptdir/parameters.pl $projectdir"); }
 	else {
 		open(outpar,">$projectdir/parameters.pl") || die "Cannot create new parameter file in $projectdir/parameters.pl\n";
@@ -414,20 +414,20 @@ if($mode=~/sequential/i) {
 		if(!$par1files) { print RED; print "There must be at least one 'pair1' sequence file in your samples file $mappingfile, and there is none!\n"; print RESET; die;  }
 		if($par1files>1) {
 			my $command="cat $ca1 > $par1name";
-			#print "$command\n";
+			print "$command\n";
 			system($command);
 		}
 		else {
-			#my $command="cp $ca1 $par1name";
+			my $command="cp $ca1 $par1name";
 			my $command="ln -s $ca1 $par1name";
-			#print "$command\n";
+			print "$command\n";
 			system($command);
 
 		}
  		if($par2files>1) { system("cat $ca2 > $par2name"); }
 		elsif ($par2files==1) { system("ln -s $ca2 $par2name"); }    #-- Support for single reads
 
-		#else { system("cp $ca2 $par2name"); }
+		else { system("cp $ca2 $par2name"); }
 		#-- CALL TO THE STANDARD PIPELINE
 
 		pipeline();
@@ -600,7 +600,7 @@ sub moving {
 
 	#-- Adjusting parameters.pl file for custom identity and evalue
 
-	# system("cp $equivfile $mappingfile");
+	system("cp $equivfile $mappingfile");
 	if((!$miniden) && (!$evalue)) { system("cp $scriptdir/parameters.pl $projectdir"); }
 	else {
 		open(outpar,">$projectdir/parameters.pl") || die "Cannot create new parameter file in $projectdir/parameters.pl\n";
