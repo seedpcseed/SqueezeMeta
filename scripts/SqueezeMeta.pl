@@ -14,7 +14,7 @@ use Term::ANSIColor qw(:constants);
 use lib ".";
 use strict;
 
-my $version="1.3.0";
+my $version="1.3.1";
 my $start_run = time();
 
 my $longtrace=0;    #-- Reports an explanation msg for each of the steps
@@ -28,23 +28,18 @@ if(-l __FILE__)
 	{
 	my $symlinkpath = dirname(__FILE__);
         my $symlinkdest = readlink(__FILE__);
-	 # $scriptdir = dirname("$symlinkpath/$symlinkdest");
-   $scriptdir = dirname(abs_path("$symlinkpath/$symlinkdest"));
+        $scriptdir = dirname(abs_path("$symlinkpath/$symlinkdest"));
         }
 else
 	{
 	$scriptdir = abs_path(dirname(__FILE__));
-	# $scriptdir = dirname(__FILE__);
 	}
-# our $installpath = "$scriptdir/..";
 our $installpath = abs_path("$scriptdir/..");
-
 ###
 
 our $pwd=cwd();
-print "The base directory appears to be $pwd"
-our($nocog,$nokegg,$nopfam,$singletons,$euknofilter,$opt_db,$nobins,$nomaxbin,$nometabat,$lowmem,$minion,,$consensus,$doublepass)="0";
-our($numsamples,$numthreads,$canumem,$mode,$mincontiglen,$assembler,$extassembly,$mapper,$projectdir,$projectname,$project,$equivfile,$rawfastq,$blocksize,$evalue,$miniden,$assembler_options,$cleaning,$cleaningoptions,$ver,$hel,$methodsfile,$test);
+our($nocog,$nokegg,$nopfam,$singletons,$euknofilter,$opt_db,$nobins,$nomaxbin,$nometabat,$empty,$lowmem,$minion,,$consensus,$doublepass)="0";
+our($numsamples,$numthreads,$canumem,$mode,$mincontiglen,$contigid,$assembler,$extassembly,$mapper,$projectdir,$projectname,$project,$equivfile,$rawfastq,$blocksize,$evalue,$miniden,$assembler_options,$cleaning,$cleaningoptions,$ver,$hel,$methodsfile,$test);
 our($databasepath,$extdatapath,$softdir,$datapath,$resultpath,$extpath,$tempdir,$interdir,$mappingfile,$contigsfna,$gff_file_blastx,$contigslen,$mcountfile,$checkmfile,$rnafile,$gff_file,$aafile,$ntfile,$daafile,$taxdiamond,$cogdiamond,$keggdiamond,$pfamhmmer,$fun3tax,$fun3kegg,$fun3cog,$fun3pfam,$allorfs,$alllog,$mapcountfile,$contigcov,$contigtable,$mergedfile,$bintax,$bincov,$bintable,$contigsinbins,$coglist,$kegglist,$pfamlist,$taxlist,$nr_db,$cog_db,$kegg_db,$lca_db,$bowtieref,$pfam_db,$metabat_soft,$maxbin_soft,$spades_soft,$barrnap_soft,$bowtie2_build_soft,$bowtie2_x_soft,$bwa_soft,$minimap2_soft,$bedtools_soft,$diamond_soft,$hmmer_soft,$megahit_soft,$prinseq_soft,$prodigal_soft,$cdhit_soft,$toamos_soft,$minimus2_soft,$canu_soft,$trimmomatic_soft,$dastool_soft);
 our(%bindirs,%dasdir);
 
@@ -76,6 +71,7 @@ Arguments:
    -c|-contiglen <size>: Minimum length of contigs (Default: 200)
    -extassembly <file>: External assembly, file containing a fasta file of contigs (overrides all assembly steps).
    --sg|--singletons: Add unassembled reads to the contig file, as if they were contigs
+   -contigid <string>: Nomenclature for contigs (Default: assembler´s name)
 
  Mapping:
    -map: mapping software <bowtie, bwa, minimap2-ont, minimap2-pb, minimap2-sr> (Default: bowtie)
@@ -93,8 +89,8 @@ Arguments:
  Binning:
    --nobins: Skip all binning  (Default: no)
    --nomaxbin: Skip MaxBin binning  (Default: no)
+   --nometabat: Skip MetaBat2 binning  (Default: no)
 
-	 --nometabat: Skip MetaBat2 binning  (Default: no)
  Performance:
    -t <threads>: Number of threads (Default: 12)
    -canumem <mem>: memory for canu in Gb (Default: 32)
@@ -103,6 +99,7 @@ Arguments:
  Other:
    --minion: Run on MinION reads (assembler: canu; mapper: minimap2-ont; consensus: 20) (Default: no)
    -test <step>: Running in test mode, stops AFTER the given step number
+   --empty: Creates a empty directory structure and conf files, does not run the pipeline
 
  Information:
    -v: Version number
@@ -117,7 +114,8 @@ my $result = GetOptions ("t=i" => \$numthreads,
 		     "canumem=i" => \$canumem,
                      "m|mode=s" => \$mode,
                      "c|contiglen=i" => \$mincontiglen,
-                     "a=s" => \$assembler,
+                     "contigid=s" => \$contigid,
+	             "a=s" => \$assembler,
                      "map=s" => \$mapper,
                      "p=s" => \$projectdir,
                      "s|samples=s" => \$equivfile,
@@ -142,6 +140,7 @@ my $result = GetOptions ("t=i" => \$numthreads,
 		     "cleaning_options=s" => \$cleaningoptions,
                      "minion" => \$minion,
 		     "test=i" => \$test,
+		     "empty" => \$empty,
 		     "v" => \$ver,
 		     "h" => \$hel
 		    );
@@ -210,7 +209,7 @@ while(<infile1>) {
 	if($_=~/ /) { print RED; print "Please do not use blank spaces in the samples file\n"; print RESET;  die; }
 	if(($iden ne "pair1") && ($iden ne "pair2")) { print RED; print "Samples file, line $_: file label must be \"pair1\" or \"pair2\". For single reads, use \"pair1\"\n"; print RESET;  die; }
 	if((!$sample) || (!$file) || (!$iden)) { print RED; print "Bad format in samples file $equivfile. Missing fields\n"; print RESET;  die; }
-	if(-e "$rawfastq/$file") {} else { print RED; print "Can't find sample file $rawfastq/$file for sample $sample in the samples file. Please check\n"; print RESET;  die; }
+	if(-e "$rawfastq/$file") {} elsif(!$empty) { print RED; print "Can't find sample file $rawfastq/$file for sample $sample in the samples file. Please check\n"; print RESET;  die; }
 }
 close infile1;
 foreach my $chsam(keys %pairsample) {
@@ -275,7 +274,7 @@ if($mode=~/sequential/i) {
 		print outfile4 "Run started ",scalar localtime," in SEQUENTIAL mode (it will proccess all metagenomes sequentially)\n";
 		print "Run started ",scalar localtime," in SEQUENTIAL mode\n";
 		my $params = join(" ", @ARGV);
-		print outfile2 "$0 $params\n";
+		# print outfile2 "$0 $params\n";
 		print outfile4 "\nSqueezeMeta v$version - (c) J. Tamames, F. Puente-Sánchez CNB-CSIC, Madrid, SPAIN\n\nPlease cite: Tamames & Puente-Sanchez, Frontiers in Microbiology 10.3389 (2019). doi: https://doi.org/10.3389/fmicb.2018.03349\n\n";
 		print outfile4 "Run started for $thissample, ",scalar localtime,"\n";
 		print outfile4 "Project: $projectname\n";
@@ -330,6 +329,7 @@ if($mode=~/sequential/i) {
 		print outfile5 "\$mincontiglen       = $mincontiglen;\n";
 		print outfile5 "\$assembler          = \"$assembler\";\n";
 		print outfile5 "\$canumem            = $canumem;\n";
+		if($contigid) { print outfile5 "\$contigid            = \"$contigid\";\n"; }
 		if($assembler_options) { print outfile5 "\$assembler_options  = \"$assembler_options\";\n"; }
 		if($extassembly)       { print outfile5 "\$extassembly        = \"$extassembly\";\n";       }
 		if($opt_db)            { print outfile5 "\$opt_db             = \"$opt_db\";\n";            }
@@ -356,9 +356,9 @@ if($mode=~/sequential/i) {
  		foreach my $file(sort keys %{ $allsamples{$thissample} }) {
  			 if(-e "$rawfastq/$file") {
   				my $tufile="$datapath/raw_fastq/$file";
- 				 system("cp $rawfastq/$file $tufile");
+ 				# system("cp $rawfastq/$file $tufile");
  				 system("ln -s $rawfastq/$file $tufile");
- 				 if($tufile!~/\.gz$/) { system("gzip $datapath/raw_fastq/$file"); }
+ 				# if($tufile!~/\.gz$/) { system("gzip $datapath/raw_fastq/$file"); }
 			}
  			 else { print RED; print "Can't find read file $file (Sample $sample). Please check if it exists\n"; print RESET; die; }
 
@@ -374,7 +374,7 @@ if($mode=~/sequential/i) {
 
 	#-- Adjusting parameters.pl file for custom identity and evalue
 
-	system("cp $equivfile $mappingfile");
+	# system("cp $equivfile $mappingfile");
 	if((!$miniden) && (!$evalue)) { system("cp $scriptdir/parameters.pl $projectdir"); }
 	else {
 		open(outpar,">$projectdir/parameters.pl") || die "Cannot create new parameter file in $projectdir/parameters.pl\n";
@@ -397,40 +397,85 @@ if($mode=~/sequential/i) {
 		}
 
 		#-- Preparing the files for the assembly, merging all files corresponding to each pair
+		if(!$empty) {
+ 			my($par1files,$par2files)=0;
+			my($par1name,$par2name);
+			my %prepsamples;
 
- 		my($par1files,$par2files)=0;
-		my($par1name,$par2name);
- 		print "Now preparing files\n";
- 		my($ca1,$ca2)="";
- 		foreach my $afiles(sort keys %{ $ident{$thissample} }) {
- 			next if($noassembly{$afiles});
-  			my $gzfiles=$afiles;
-  			#if($gzfiles!~/gz$/) { $gzfiles.=".gz"; }
- 			if($ident{$thissample}{$afiles} eq "pair1") { $ca1.="$datapath/raw_fastq/$gzfiles "; $par1files++; }
-			else { $ca2.="$datapath/raw_fastq/$gzfiles "; $par2files++; }
-			if($gzfiles=~/gz$/) { $par1name="$datapath/raw_fastq/par1.fastq.gz"; $par2name="$datapath/raw_fastq/par2.fastq.gz"; }  # Fixed bug 30/10/2018 JT
-			else { $par1name="$datapath/raw_fastq/par1.fastq"; $par2name="$datapath/raw_fastq/par2.fastq"; }
+			#-- NOW FILTERING READS
+
+			my $trimmomatic_command;
+			open(infile4,$equivfile) or do { print RED; print "Can't open samples file (-s) in $equivfile. Please check if that is the correct file, it is present tin that location, and you have reading permissions\n"; print RESET; die; };
+			if($cleaning) {
+				while(<infile4>) {
+ 					chomp;
+ 					next if(!$_ || ($_=~/^\#/));
+					$_=~s/\r//g;			#-- Deleting \r in samples file for windows compatibility
+					my ($sample,$file,$iden,$mapreq)=split(/\t/,$_);
+					if($sample eq $thissample) { $prepsamples{$sample}{$iden}=$file; }
+					}
+				close infile4;
+				foreach my $ts(sort keys %prepsamples) {
+					my $par1name="$datapath/raw_fastq/".$prepsamples{$ts}{pair1};
+					my $par2name="$datapath/raw_fastq/".$prepsamples{$ts}{pair2};
+					my $orig1=$par1name;
+					my $orig2=$par2name;
+					$orig1=~s/\.fastq/\.original.fastq/;
+					$orig1=~s/\.fasta/\.original.fasta/;
+					$orig2=~s/\.fastq/\.original.fastq/;
+					$orig2=~s/\.fasta/\.original.fasta/;
+					my $tcommand="mv $par1name $orig1; mv $par2name $orig2";
+					system $tcommand;
+					if(-e $orig2) { $trimmomatic_command="$trimmomatic_soft PE -threads $numthreads -phred33 $orig1 $orig2 $par1name $par1name.removed $par2name $par2name.removed $cleaningoptions > /dev/null 2>&1"; }
+					else { $trimmomatic_command="$trimmomatic_soft SE -threads $numthreads -phred33 $orig1 $par1name $cleaningoptions > /dev/null 2>&1"; }
+
+					if($cleaning) {
+						print "  Running trimmomatic (Bolger et al 2014, Bioinformatics 30(15):2114-20) for quality filtering\n  Parameters: $cleaningoptions\n";
+						print outfile4 "Running trimmomatic: $trimmomatic_command";
+						my $ecode = system $trimmomatic_command;
+						if($ecode!=0) { die "Error running command:    $trimmomatic_command"; }
+						print outmet "Quality filtering was done using Trimmomatic (Bolger et al 2014, Bioinformatics 30(15):2114-20)\n";
+						}
+					}
+				}
+
+
+			print "Now preparing files\n";
+ 			my($ca1,$ca2)="";
+ 			foreach my $afiles(sort keys %{ $ident{$thissample} }) {
+ 				next if($noassembly{$afiles});
+  				my $gzfiles=$afiles;
+  				#if($gzfiles!~/gz$/) { $gzfiles.=".gz"; }
+ 				if($ident{$thissample}{$afiles} eq "pair1") { $ca1.="$datapath/raw_fastq/$gzfiles "; $par1files++; }
+				else { $ca2.="$datapath/raw_fastq/$gzfiles "; $par2files++; }
+				if($gzfiles=~/gz$/) { $par1name="$datapath/raw_fastq/par1.fastq.gz"; $par2name="$datapath/raw_fastq/par2.fastq.gz"; }  # Fixed bug 30/10/2018 JT
+				else { $par1name="$datapath/raw_fastq/par1.fastq"; $par2name="$datapath/raw_fastq/par2.fastq"; }
+			}
+			if(!$par1files) { print RED; print "There must be at least one 'pair1' sequence file in your samples file $mappingfile, and there is none!\n"; print RESET; die;  }
+			if($par1files>1) {
+				my $command="cat $ca1 > $par1name";
+				#print "$command\n";
+				system($command);
+			}
+			else {
+				#my $command="cp $ca1 $par1name";
+				my $command="ln -s $ca1 $par1name";
+				#print "$command\n";
+				system($command);
+
+			}
+ 			if($par2files>1) { system("cat $ca2 > $par2name"); }
+			elsif ($par2files==1) { system("ln -s $ca2 $par2name"); }    #-- Support for single reads
+
+			#else { system("cp $ca2 $par2name"); }
+
+
+
+			#-- CALL TO THE STANDARD PIPELINE
+
+			pipeline();
 		}
-		if(!$par1files) { print RED; print "There must be at least one 'pair1' sequence file in your samples file $mappingfile, and there is none!\n"; print RESET; die;  }
-		if($par1files>1) {
-			my $command="cat $ca1 > $par1name";
-			print "$command\n";
-			system($command);
-		}
-		else {
-			my $command="cp $ca1 $par1name";
-			my $command="ln -s $ca1 $par1name";
-			print "$command\n";
-			system($command);
-
-		}
- 		if($par2files>1) { system("cat $ca2 > $par2name"); }
-		elsif ($par2files==1) { system("ln -s $ca2 $par2name"); }    #-- Support for single reads
-
-		else { system("cp $ca2 $par2name"); }
-		#-- CALL TO THE STANDARD PIPELINE
-
-		pipeline();
+		else { print "Directory structure and conf files created for $thissample\n"; }
 
 
  		close outfile4;		#-- Closing log file for the sample
@@ -516,6 +561,7 @@ else {
 	print outfile6 "\n#-- Options\n\n";
 	print outfile6 "\$numthreads         = $numthreads;\n";
 	print outfile6 "\$mincontiglen       = $mincontiglen;\n";
+        if($contigid) { print outfile5 "\$contigid            = \"$contigid\";\n"; }
 	print outfile6 "\$assembler          = \"$assembler\";\n";
 	print outfile6 "\$canumem            = $canumem;\n";
 	if($assembler_options) { print outfile6 "\$assembler_options  = \"$assembler_options\";\n"; }
@@ -540,14 +586,50 @@ else {
  	system ("mkdir $extpath");
 	system ("mkdir $interdir");
 
-	#-- Preparing the files for the assembly
+	#--Creation of samples file
 
-	moving();
+        open(infile0,$equivfile) || die;        #-- Deleting \r in samples file for windows compatibility
+        open(outfile0,">$mappingfile") || die;
+        while(<infile0>) {
+                $_=~s/\r//g;
+                print outfile0 $_;
+                }
+        close outfile0;
+        close infile0;
 
-	#-- CALL TO THE STANDARD PIPELINE
+        #-- Adjusting parameters.pl file for custom identity and evalue
 
-	pipeline();
+        # system("cp $equivfile $mappingfile");
+        if((!$miniden) && (!$evalue)) { system("cp $scriptdir/parameters.pl $projectdir"); }
+        else {
+                open(outpar,">$projectdir/parameters.pl") || die "Cannot create new parameter file in $projectdir/parameters.pl\n";
+                open(inpar,"$scriptdir/parameters.pl") || die "Cannot open parameter file in $scriptdir/parameters.pl\n";
+                while(<inpar>) {
+                        if($miniden && ($_=~/^\$miniden.*?\=(\d+)/)) {
+                                $_=~s/$1/$miniden/;
+                                print outpar $_;
+                                }
+                        elsif($evalue && ($_=~/^\$evalue.*?\=([^;]+)/)) {
+                                $_=~s/$1/$evalue/;
+                                print outpar $_;
+                                }
+                        else { print outpar $_; }
+                        }
+                close inpar;
+                close outpar;
+                }
 
+	if(!$empty) {
+
+		#-- Preparing the files for the assembly
+
+		moving();
+
+		#-- CALL TO THE STANDARD PIPELINE
+
+		pipeline();
+		}
+	else { die "  Directory structure and conf files created. Exiting\n"; }
 	close outfile4;  #-- Closing log file for the sample
 	close outfile3;	  #-- Closing progress file for the sample
 
@@ -560,7 +642,9 @@ sub moving {
 
 	#-- Reading samples from the file specified with -s option
 
-	my(%allsamples,%ident,%noassembly);
+	my(%allsamples,%ident,%prepsamples,%noassembly);
+
+
 	open(infile4,$equivfile) or do { print RED; print "Can't open samples file (-s) in $equivfile. Please check if that is the correct file, it is present tin that location, and you have reading permissions\n"; print RESET; die; };
 	while(<infile4>) {
  		chomp;
@@ -572,14 +656,50 @@ sub moving {
 		if(($mapreq) && ($mapreq=~/noassembly/i)) { $noassembly{$file}=1; }    #-- Files flagged for no assembly (but they will be mapped)
 		if(-e "$rawfastq/$file") {
 			my $tufile="$datapath/raw_fastq/$file";
-			# system("cp $rawfastq/$file $tufile");
-			system("ln -s $rawfastq/$file $tufile");
-			print outfile4 "Linking files: ln -s $rawfastq/$file $tufile\n";
+			 system("cp $rawfastq/$file $tufile");
+			# system("ln -s $rawfastq/$file $tufile");
+			print outfile4 "Coppying files: cp $rawfastq/$file $tufile\n";
 			# if($tufile!~/\.gz$/) { system("gzip $datapath/raw_fastq/$file"); }
 		}
 		else { print RED; print "Can't find read file $file (Sample $sample)\n"; print RESET; die; }
 	}
 	close infile4;
+
+	my $trimmomatic_command;
+	open(infile4,$equivfile) or do { print RED; print "Can't open samples file (-s) in $equivfile. Please check if that is the correct file, it is present tin that location, and you have reading permissions\n"; print RESET; die; };
+	if($cleaning) {
+		while(<infile4>) {
+ 			chomp;
+ 			next if(!$_ || ($_=~/^\#/));
+			$_=~s/\r//g;			#-- Deleting \r in samples file for windows compatibility
+			my ($sample,$file,$iden,$mapreq)=split(/\t/,$_);
+			$prepsamples{$sample}{$iden}=$file;
+			}
+		close infile4;
+		foreach my $ts(sort keys %prepsamples) {
+			my $par1name="$datapath/raw_fastq/".$prepsamples{$ts}{pair1};
+			my $par2name="$datapath/raw_fastq/".$prepsamples{$ts}{pair2};
+			my $orig1=$par1name;
+			my $orig2=$par2name;
+			$orig1=~s/\.fastq/\.original.fastq/;
+			$orig1=~s/\.fasta/\.original.fasta/;
+			$orig2=~s/\.fastq/\.original.fastq/;
+			$orig2=~s/\.fasta/\.original.fasta/;
+			my $tcommand="mv $par1name $orig1; mv $par2name $orig2";
+			system $tcommand;
+			if(-e $orig2) { $trimmomatic_command="$trimmomatic_soft PE -threads $numthreads -phred33 $orig1 $orig2 $par1name $par1name.removed $par2name $par2name.removed $cleaningoptions > /dev/null 2>&1"; }
+			else { $trimmomatic_command="$trimmomatic_soft SE -threads $numthreads -phred33 $orig1 $par1name $cleaningoptions > /dev/null 2>&1"; }
+
+			if($cleaning) {
+				print "  Running trimmomatic (Bolger et al 2014, Bioinformatics 30(15):2114-20) for quality filtering\n  Parameters: $cleaningoptions\n";
+				print outfile4 "Running trimmomatic: $trimmomatic_command";
+				my $ecode = system $trimmomatic_command;
+				if($ecode!=0) { die "Error running command:    $trimmomatic_command"; }
+				print outmet "Quality filtering was done using Trimmomatic (Bolger et al 2014, Bioinformatics 30(15):2114-20)\n";
+				}
+			}
+		}
+
 
 	my @nmg=keys %allsamples;
 	$numsamples=$#nmg+1;
@@ -589,36 +709,6 @@ sub moving {
 	if($numsamples==1) { print "$numsamples sample found\n"; }
 	else { print "$numsamples samples found: @nmg\n\n"; }
 
-	open(infile0,$equivfile) || die;	#-- Deleting \r in samples file for windows compatibility
-	open(outfile0,">$mappingfile") || die;
-	while(<infile0>) {
-		$_=~s/\r//g;
-		print outfile0 $_;
-		}
-	close outfile0;
-	close infile0;
-
-	#-- Adjusting parameters.pl file for custom identity and evalue
-
-	system("cp $equivfile $mappingfile");
-	if((!$miniden) && (!$evalue)) { system("cp $scriptdir/parameters.pl $projectdir"); }
-	else {
-		open(outpar,">$projectdir/parameters.pl") || die "Cannot create new parameter file in $projectdir/parameters.pl\n";
-		open(inpar,"$scriptdir/parameters.pl") || die "Cannot open parameter file in $scriptdir/parameters.pl\n";
-		while(<inpar>) {
-			if($miniden && ($_=~/^\$miniden.*?\=(\d+)/)) {
-				$_=~s/$1/$miniden/;
-				print outpar $_;
-				}
-			elsif($evalue && ($_=~/^\$evalue.*?\=([^;]+)/)) {
-				$_=~s/$1/$evalue/;
-				print outpar $_;
-				}
-			else { print outpar $_; }
-			}
-		close inpar;
-		close outpar;
-		}
 
 	#-- For coassembly mode, we merge all individual files for each pair
 
@@ -636,8 +726,21 @@ sub moving {
 
 		if(!$par1files) { print RED; print "There must be at least one 'pair1' sequence file in your samples file $mappingfile, and there is none!\n"; print RESET; die; }
 		print outfile4 "Merging files for coassembly: ";
-		if($par1files>1) { system("cat $ca1 > $par1name"); print outfile4 "cat $ca1 > $par1name; "; } else { system("ln -s $ca1 $par1name"); print outfile4 "ln -s $ca1 $par1name; "; }
-		if($par2files>1) { system("cat $ca2 > $par2name"); print outfile4 "cat $ca2 > $par2name; "; } elsif($par2files==1) { system("ln -s $ca2 $par2name"); print outfile4 "ln -s $ca2 $par2name; "; }  #-- Support for single reads
+		if($par1files>1) {
+			system("cat $ca1 > $par1name");
+			my $command="sed -e '/^$/d' $par1name > $par1name.prov; cp $par1name.prov $par1name";
+			#print "*$command*\n";
+			# system($command);
+			print outfile4 "cat $ca1 > $par1name; ";
+			}
+		else { system("ln -s $ca1 $par1name"); print outfile4 "ln -s $ca1 $par1name; "; }
+		if($par2files>1) {
+			system("cat $ca2 > $par2name");
+			my $command="sed -e '/^$/d' $par2name > $par2name.prov; cp $par2name.prov $par2name";
+			# system($command);
+			print outfile4 "cat $ca2 > $par2name; ";
+			}
+		elsif($par2files==1) { system("ln -s $ca2 $par2name"); print outfile4 "ln -s $ca2 $par2name; "; }  #-- Support for single reads
 		print outfile4 "\n";
 	}
 }               #-- END
@@ -727,8 +830,7 @@ sub pipeline {
                		print outfile3 "1\t$scriptname\n";
                 	$currtime=timediff();
                 	print outfile4 "[",$currtime->pretty,"]: STEP1 -> $scriptname\n";
-                	print BLUE "[",$cu
-									rrtime->pretty,"]: STEP1 ->  ADDING SINGLETONS: $scriptname\n"; print RESET;
+                	print BLUE "[",$currtime->pretty,"]: STEP1 ->  ADDING SINGLETONS: $scriptname\n"; print RESET;
                 	if($longtrace) { print " (This will remap reads to contigs and add the unmapped ones as if they were contigs)\n"; }
                 	my $ecode = system("perl $scriptdir/$scriptname $projectdir");
                 	if($ecode!=0)        { print RED; print "Stopping in STEP1 -> $scriptname\n"; print RESET; die; }
