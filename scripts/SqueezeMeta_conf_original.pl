@@ -7,7 +7,8 @@ $projectdir   = abs_path(dirname(__FILE__));
 
 #-- Generic paths
 
-$databasepath = "databases/squeezemeta/db";
+$installpath  = "/SqueezeMeta";
+$databasepath = "$projectdir/databases/squeezemeta/db";
 $extdatapath  = "$installpath/data";
 $scriptdir    = "$installpath/scripts";   #-- Scripts directory
 
