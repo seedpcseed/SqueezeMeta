@@ -8,7 +8,7 @@ $projectdir   = "assembly/squeezemeta";
 #-- Generic paths
 
 $installpath  = "/SqueezeMeta";
-$databasepath = "$projectdir/databases/squeezemeta/db";
+$databasepath = "databases/squeezemeta/db";
 $extdatapath  = "$installpath/data";
 $scriptdir    = "$installpath/scripts";   #-- Scripts directory
 
