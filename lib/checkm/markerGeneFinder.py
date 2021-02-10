@@ -55,9 +55,14 @@ class MarkerGeneFinder():
         self.logger.info("  Identifying marker genes in %d bins with %d threads:" % (len(binFiles), self.totalThreads))
 
         # process each bin in parallel
+        # #debug-code
+        self.logger.info("      In markerGeneFinder.py - next workerQueue set up:")
+
         workerQueue = mp.Queue()
         writerQueue = mp.Queue()
 
+        # #debug-code
+        self.logger.info("      Putting binFiles in workerQueue.put:")
         for binFile in binFiles:
             workerQueue.put(binFile)
 
@@ -66,6 +71,8 @@ class MarkerGeneFinder():
 
         binIdToModels = mp.Manager().dict()
 
+        # #debug-code
+        self.logger.info("      running mp.Process:")
         try:
             calcProc = [mp.Process(target=self.__processBin, args=(outDir, tableOut, hmmerOut, markerFile, bKeepAlignment, bNucORFs, bCalledGenes, workerQueue, writerQueue)) for _ in range(self.totalThreads)]
             writeProc = mp.Process(target=self.__reportProgress, args=(len(binFiles), binIdToModels, writerQueue))
