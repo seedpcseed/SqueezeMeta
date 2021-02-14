@@ -95,6 +95,7 @@ Arguments:
    -t <threads>: Number of threads (Default: 12)
    -canumem <mem>: memory for canu in Gb (Default: 32)
    --lowmem: run on less than 16Gb of memory (Default:no)
+	 --force: force run
 
  Other:
    --minion: Run on MinION reads (assembler: canu; mapper: minimap2-ont; consensus: 20) (Default: no)
@@ -122,6 +123,7 @@ my $result = GetOptions ("t=i" => \$numthreads,
                      "extassembly=s" => \$extassembly,
                      "f|seq=s" => \$rawfastq,
                      "sg|singletons" => \$singletons,
+				 "force" => \$force,
 		     "nocog" => \$nocog,
 		     "nokegg" => \$nokegg,
 		     "nopfam" => \$nopfam,
@@ -491,7 +493,7 @@ if($mode=~/sequential/i) {
 
 else {
 
-	if (-d $projectdir) {
+	if (-d $projectdir & !$force) {
 		print RED;
 		print "Project name $projectdir already exists. Please remove it or change project name\n";
 		print RESET;
