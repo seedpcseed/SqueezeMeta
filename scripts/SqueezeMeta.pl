@@ -499,7 +499,7 @@ else {
 		print RESET;
 		die;
 	}else{
-		print "Making directory at $projectdir\n"
+		print "Making directory at $projectdir\n";
 		my $ecode = system("mkdir $projectdir");
 		if($ecode!=0){
 			print RED;
