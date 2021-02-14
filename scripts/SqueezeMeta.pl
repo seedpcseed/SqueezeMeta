@@ -194,7 +194,7 @@ if(($assembler=~/flye/i) && ($mode=~/merge/i)) { $dietext.="Invalid combination 
 if($rawfastq=~/^\//) {} else { $rawfastq=abs_path($rawfastq); }
 if($dietext) { print BOLD "$helpshort"; print RESET; print RED; print "$dietext"; print RESET;  die; }
 
-$projectdir = abs_path($projectdir);
+# $projectdir = os.getcwd()/$projectdir;
 $projectname = (split '/', $projectdir)[-1];
 my $syslogfile="$projectdir/syslog";
 
@@ -267,7 +267,7 @@ if($mode=~/sequential/i) {
 
 		$projectname=$thissample;
 		my $projectdir="$pwd/$thissample";
-		if (-d $projectdir) { print RED; print "Project name $projectdir already exists. Please remove it or change the project name\n"; print RESET; die; } else { system("mkdir $projectdir"); }
+		if (-d $projectdir & !$force) { print RED; print "Project name $projectdir already exists. Please remove it or change the project name\n"; print RESET; die; } else { system("mkdir $projectdir"); }
 		print "Working with $thissample\n";
 
 		open(outfile3,">$projectdir/progress") or do { print RED; print "Can't write in directory $projectdir. Wrong permissions, or out of space?\n"; print RESET; die; };  #-- An index indicating where are we and which parts of the method finished already. For the global process
