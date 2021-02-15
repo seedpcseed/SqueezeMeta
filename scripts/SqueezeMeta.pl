@@ -341,12 +341,14 @@ if($mode=~/sequential/i) {
 
 		print "Reading configuration from $projectdir/SqueezeMeta_conf.pl\n";
 		do "$projectdir/SqueezeMeta_conf.pl";
-		system ("mkdir $datapath");
- 		system ("mkdir $resultpath");
- 		system ("mkdir $tempdir");
- 		system ("mkdir $datapath/raw_fastq");
- 		system ("mkdir $extpath");
-		system ("mkdir $interdir");
+
+		if(!os.path.isdir($datapath)) {system ("mkdir $datapath");}
+		if(!os.path.isdir($resultpath)) {system ("mkdir $resultpath");}
+		if(!os.path.isdir($tempdir)) {system ("mkdir $tempdir");}
+		if(!os.path.isdir($datapath/raw_fastq)) {system ("mkdir $datapath/raw_fastq");}
+		if(!os.path.isdir($extpath)) {system ("mkdir $extpath");}
+		if(!os.path.isdir($interdir)) {system ("mkdir $interdir");}
+
 		open(outmet,">$methodsfile") || warn "Cannot open methods file $methodsfile for writing methods and references\n";
 		print outmet "Analysis done with SqueezeMeta v$version (Tamames & Puente-Sanchez 2019, Frontiers in Microbiology 9, 3349)\n";
 		close outmet;
@@ -540,7 +542,7 @@ else {
 	print outfile6 "\$projectdir = \"$projectdir\";\n\n";
 	print outfile6 "\$mode = \"$mode\";\n\n";
 	print outfile6 "\$installpath = \"$installpath\";\n";
-	
+
 	while(<infile3>) {
 		if   ($_=~/^\$projectname/)               { print outfile6 "\$projectname = \"$projectname\";\n";                     }
 		elsif($_=~/^\$blocksize/)                 { print outfile6 "\$blocksize       = $blocksize;\n";                       }
@@ -584,12 +586,12 @@ else {
 
 	#-- Creation of directories
 
-	system ("mkdir $datapath");
-	system ("mkdir $resultpath");
-	system ("mkdir $tempdir");
-	system ("mkdir $datapath/raw_fastq");
- 	system ("mkdir $extpath");
-	system ("mkdir $interdir");
+	if(!os.path.isdir($datapath)) {system ("mkdir $datapath");}
+	if(!os.path.isdir($resultpath)) {system ("mkdir $resultpath");}
+	if(!os.path.isdir($tempdir)) {system ("mkdir $tempdir");}
+	if(!os.path.isdir($datapath/raw_fastq)) {system ("mkdir $datapath/raw_fastq");}
+ 	if(!os.path.isdir($extpath)) {system ("mkdir $extpath");}
+	if(!os.path.isdir($interdir)) {system ("mkdir $interdir");}
 
 	#--Creation of samples file
 
