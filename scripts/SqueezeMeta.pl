@@ -537,8 +537,10 @@ else {
 	open(infile3,"$scriptdir/SqueezeMeta_conf.pl") or do { print RED; print "Can't open $scriptdir/SqueezeMeta_conf.pl\n"; print RESET; die; };
 	open(outfile6,">$projectdir/SqueezeMeta_conf.pl") or do { print RED; print "Can't write in directory $projectdir. Wrong permissions, or out of space?\n"; print RESET; die; };
 
+	print outfile6 "\$projectdir = \"$projectdir\";\n\n";
 	print outfile6 "\$mode = \"$mode\";\n\n";
 	print outfile6 "\$installpath = \"$installpath\";\n";
+	
 	while(<infile3>) {
 		if   ($_=~/^\$projectname/)               { print outfile6 "\$projectname = \"$projectname\";\n";                     }
 		elsif($_=~/^\$blocksize/)                 { print outfile6 "\$blocksize       = $blocksize;\n";                       }
