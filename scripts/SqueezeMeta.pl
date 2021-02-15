@@ -501,11 +501,11 @@ else {
 	}else{
 		print "Making directory at $projectdir\n";
 		my $ecode = system("mkdir $projectdir");
-		if($ecode!=0){
-			print RED;
-			print "Can't create project directory at $projectdir\n";
-			print RESET;
-			die;
+#		if($ecode!=0){
+#			print RED;
+#			print "Can't create project directory at $projectdir\n";
+#			print RESET;
+#			die;
 		}
 	}
 
