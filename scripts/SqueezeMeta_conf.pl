@@ -5,7 +5,6 @@ use Cwd 'abs_path';
 
 # $projectdir   = "assembly/squeezemeta";
 
-
 #-- Generic paths
 
 $databasepath = "$projectdir/databases/squeezemeta/db";
