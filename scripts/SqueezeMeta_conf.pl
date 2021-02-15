@@ -2,7 +2,8 @@
 
 use File::Basename;
 use Cwd 'abs_path';
-$projectdir   = "assembly/squeezemeta";
+
+# $projectdir   = "assembly/squeezemeta";
 
 
 #-- Generic paths
@@ -67,7 +68,7 @@ $contigtable     = "$resultpath/20.$projectname.contigtable";   #-- From getcont
 $coglist   = "$extdatapath/coglist.txt";        #-- COG equivalence file (COGid -> Function -> Functional class)
 $kegglist  = "$extdatapath/keggfun2.txt";       #-- KEGG equivalence file (KEGGid -> Function -> Functional class)
 $pfamlist  = "$extdatapath/pfam.dat";           #-- PFAM equivalence file
-$taxlist   = "$extdatapath/alltaxlist.txt";     #-- Tax equivalence file 
+$taxlist   = "$extdatapath/alltaxlist.txt";     #-- Tax equivalence file
 $nr_db     = "$databasepath/nr.dmnd";
 $cog_db    = "$databasepath/eggnog";
 $kegg_db   = "$databasepath/keggdb";
