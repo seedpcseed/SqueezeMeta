@@ -26,14 +26,16 @@ import getopt
 import json
 import logging
 import multiprocessing
-import os
+import os, glob
 import shutil
+import locale
 import signal
 import subprocess
 import sys
 import tempfile
 import time
 import math
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -67,8 +69,8 @@ Optional Arguments:
     --merge-level            <l,s>          merge complex bubbles of length <= l*kmer_size and similarity >= s [20,0.95]
     --prune-level            <int>          strength of low depth pruning (0-3) [2]
     --prune-depth            <int>          remove unitigs with avg kmer depth less than this value [2]
-    --disconnect-ratio       <float>        disconnect unitigs if its depth is less than this ratio times 
-                                            the total depth of itself and its siblings [0.1]  
+    --disconnect-ratio       <float>        disconnect unitigs if its depth is less than this ratio times
+                                            the total depth of itself and its siblings [0.1]
     --low-local-ratio        <float>        remove unitigs if its depth is less than this ratio times
                                             the average depth of the neighborhoods [0.2]
     --max-tip-len            <int>          remove tips less than this value [2*k]
