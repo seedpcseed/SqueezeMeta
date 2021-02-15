@@ -156,6 +156,7 @@ if(!$assembler) { $assembler="megahit"; }
 if(!$mapper) { $mapper="bowtie"; }
 if(!$blocksize) { $blocksize="NF"; }
 if(!$singletons) { $singletons=0; }
+if(!$force) { $force=0; }
 if(!$nocog) { $nocog=0; }
 if(!$nokegg) { $nokegg=0; }
 if(!$nopfam) { $nopfam=0; }
@@ -177,7 +178,6 @@ if($lowmem) { $blocksize=3; $canumem=15; }
 if($minion) { $assembler="canu"; $mapper="minimap2-ont"; }
 
 #-- Check if we have all the needed options
-
 
 my($dietext,$finaltrace);
 if($ver) { print "$version\n"; exit; }
@@ -506,7 +506,7 @@ else {
 #			print "Can't create project directory at $projectdir\n";
 #			print RESET;
 #			die;
-		}
+#		}
 	}
 
 	#-- We start creating directories, progress and log files
@@ -562,11 +562,11 @@ else {
 	close infile3;
 
 	print outfile6 "\n#-- Options\n\n";
-	print outfile6 "\$numthreads         = $numthreads;\n";
-	print outfile6 "\$mincontiglen       = $mincontiglen;\n";
-        if($contigid) { print outfile5 "\$contigid            = \"$contigid\";\n"; }
-	print outfile6 "\$assembler          = \"$assembler\";\n";
-	print outfile6 "\$canumem            = $canumem;\n";
+	print outfile6 "\$numthreads = $numthreads;\n";
+	print outfile6 "\$mincontiglen  = $mincontiglen;\n";
+  if($contigid) { print outfile5 "\$contigid = \"$contigid\";\n"; }
+	print outfile6 "\$assembler  = \"$assembler\";\n";
+	print outfile6 "\$canumem  = $canumem;\n";
 	if($assembler_options) { print outfile6 "\$assembler_options  = \"$assembler_options\";\n"; }
 	if($extassembly)       { print outfile6 "\$extassembly        = \"$extassembly\";\n";       }
 	if($opt_db)            { print outfile6 "\$opt_db             = \"$opt_db\";\n";            }
@@ -591,36 +591,36 @@ else {
 
 	#--Creation of samples file
 
-        open(infile0,$equivfile) || die;        #-- Deleting \r in samples file for windows compatibility
-        open(outfile0,">$mappingfile") || die;
-        while(<infile0>) {
-                $_=~s/\r//g;
-                print outfile0 $_;
-                }
-        close outfile0;
-        close infile0;
+  open(infile0,$equivfile) || die;        #-- Deleting \r in samples file for windows compatibility
+  open(outfile0,">$mappingfile") || die;
+  while(<infile0>) {
+          $_=~s/\r//g;
+          print outfile0 $_;
+          }
+  close outfile0;
+  close infile0;
 
-        #-- Adjusting parameters.pl file for custom identity and evalue
+  #-- Adjusting parameters.pl file for custom identity and evalue
 
-        # system("cp $equivfile $mappingfile");
-        if((!$miniden) && (!$evalue)) { system("cp $scriptdir/parameters.pl $projectdir"); }
-        else {
-                open(outpar,">$projectdir/parameters.pl") || die "Cannot create new parameter file in $projectdir/parameters.pl\n";
-                open(inpar,"$scriptdir/parameters.pl") || die "Cannot open parameter file in $scriptdir/parameters.pl\n";
-                while(<inpar>) {
-                        if($miniden && ($_=~/^\$miniden.*?\=(\d+)/)) {
-                                $_=~s/$1/$miniden/;
-                                print outpar $_;
-                                }
-                        elsif($evalue && ($_=~/^\$evalue.*?\=([^;]+)/)) {
-                                $_=~s/$1/$evalue/;
-                                print outpar $_;
-                                }
-                        else { print outpar $_; }
-                        }
-                close inpar;
-                close outpar;
-                }
+  # system("cp $equivfile $mappingfile");
+  if((!$miniden) && (!$evalue)) { system("cp $scriptdir/parameters.pl $projectdir"); }
+  else {
+          open(outpar,">$projectdir/parameters.pl") || die "Cannot create new parameter file in $projectdir/parameters.pl\n";
+          open(inpar,"$scriptdir/parameters.pl") || die "Cannot open parameter file in $scriptdir/parameters.pl\n";
+          while(<inpar>) {
+                  if($miniden && ($_=~/^\$miniden.*?\=(\d+)/)) {
+                          $_=~s/$1/$miniden/;
+                          print outpar $_;
+                          }
+                  elsif($evalue && ($_=~/^\$evalue.*?\=([^;]+)/)) {
+                          $_=~s/$1/$evalue/;
+                          print outpar $_;
+                          }
+                  else { print outpar $_; }
+                  }
+          close inpar;
+          close outpar;
+          }
 
 	if(!$empty) {
 
@@ -635,7 +635,6 @@ else {
 	else { die "  Directory structure and conf files created. Exiting\n"; }
 	close outfile4;  #-- Closing log file for the sample
 	close outfile3;	  #-- Closing progress file for the sample
-
 }                        #------ END
 
 
