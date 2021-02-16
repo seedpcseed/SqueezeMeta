@@ -709,6 +709,7 @@ def build_library():
 
     def create_fifo(read_type, num, command):
         fifo_path = os.path.join(opt.temp_dir, 'inpipe.{0}.{1}'.format(read_type, num))
+        print "fifo_path" + $fifo_path
         remove_if_exists(fifo_path)
         os.mkfifo(fifo_path)
         fifos.append(fifo_path)
