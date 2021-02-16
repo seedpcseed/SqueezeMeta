@@ -342,12 +342,12 @@ if($mode=~/sequential/i) {
 		print "Reading configuration from $projectdir/SqueezeMeta_conf.pl\n";
 		do "$projectdir/SqueezeMeta_conf.pl";
 
-		if(!os.path.isdir($datapath)) {system ("mkdir $datapath");}
-		if(!os.path.isdir($resultpath)) {system ("mkdir $resultpath");}
-		if(!os.path.isdir($tempdir)) {system ("mkdir $tempdir");}
-		if(!os.path.isdir($datapath/raw_fastq)) {system ("mkdir $datapath/raw_fastq");}
-		if(!os.path.isdir($extpath)) {system ("mkdir $extpath");}
-		if(!os.path.isdir($interdir)) {system ("mkdir $interdir");}
+		if(!d($datapath)) {system ("mkdir $datapath");}
+		if(!d($resultpath)) {system ("mkdir $resultpath");}
+		if(!d($tempdir)) {system ("mkdir $tempdir");}
+		if(!d($datapath/raw_fastq)) {system ("mkdir $datapath/raw_fastq");}
+		if(!d($extpath)) {system ("mkdir $extpath");}
+		if(!d($interdir)) {system ("mkdir $interdir");}
 
 		open(outmet,">$methodsfile") || warn "Cannot open methods file $methodsfile for writing methods and references\n";
 		print outmet "Analysis done with SqueezeMeta v$version (Tamames & Puente-Sanchez 2019, Frontiers in Microbiology 9, 3349)\n";
