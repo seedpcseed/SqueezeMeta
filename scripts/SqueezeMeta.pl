@@ -589,7 +589,7 @@ else {
 	if(!-d($datapath)) {system ("mkdir $datapath");}
 	if(!-d($resultpath)) {system ("mkdir $resultpath");}
 	if(!-d($tempdir)) {system ("mkdir $tempdir");}
-	if(!-d($datapath/'raw_fastq')) {system ("mkdir $datapath/raw_fastq");}
+	if(!-d($datapath/'raw_fastq')) {system ("mkdir $datapath/'raw_fastq'");}
 	if(!-d($extpath)) {system ("mkdir $extpath");}
 	if(!-d($interdir)) {system ("mkdir $interdir");}
 
