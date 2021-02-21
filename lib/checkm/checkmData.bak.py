@@ -36,8 +36,7 @@ class DBConfig(object):
     """
     def __init__(self):
         self.logger = logging.getLogger()
-        # self.configFile = os.path.abspath(resource_filename('checkm', 'DATA_CONFIG'))
-        self.configFile = '/opt/miniconda-latest/SqueezeMeta/lib/checkm/DATA_CONFIG'
+        self.configFile = os.path.abspath(resource_filename('checkm', 'DATA_CONFIG'))
         self.values = self.getConfig()
 
 #-----------------------------------------------------------------------------
