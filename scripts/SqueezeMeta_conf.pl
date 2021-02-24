@@ -3,14 +3,11 @@
 use File::Basename;
 use Cwd 'abs_path';
 
-# $projectdir   = "assembly/squeezemeta";
-
 #-- Generic paths
 
 $databasepath = "databases/squeezemeta/db";
 $extdatapath  = "$installpath/data";
 $scriptdir    = "$installpath/scripts";   #-- Scripts directory
-
 
 #-- Paths relative to the project
 
@@ -22,7 +19,6 @@ $tempdir     = "$projectdir/temp";                                       #-- Tem
 $interdir    = "$projectdir/intermediate";                               #-- Temp directory
 %bindirs     = ("maxbin","$resultpath/maxbin","metabat2","$resultpath/metabat2");  #-- Directories for bins
 %dasdir      = ("DASTool","$resultpath/DAS/$projectname\_DASTool\_bins");	   #-- Directory for DASTool results
-
 
 #-- Result files
 
@@ -90,7 +86,6 @@ $singletons      = 0;
 $cleaning        = 0;
 $cleaningoptions = "LEADING:8 TRAILING:8 SLIDINGWINDOW:10:15 MINLEN:30";
 $mapper          = "bowtie";
-
 
 #-- External software
 
