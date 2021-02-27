@@ -1231,28 +1231,28 @@ sub pipeline {
 		}
 
 
-    #-------------------------------- STEP18: Checking of bins for completeness and contamination (checkM)
-
-		if(($rpoint<=18) && ((!$test) || ($test>=18))) {
-			if(!$DAS_Tool_empty){
-				my $scriptname="18.checkM_batch.pl";
-				print outfile3 "18\t$scriptname\n";
-				$currtime=timediff();
-				print outfile4 "\n[",$currtime->pretty,"]: STEP18 -> $scriptname\n";
-				print BLUE "[",$currtime->pretty,"]: STEP18 -> CHECKING BINS: $scriptname\n"; print RESET;
-				if($longtrace) { print " (This step will use checkM for estimating completeness and contamination for each bin)\n"; }
-				my $ecode = system("perl $scriptdir/$scriptname $projectdir");
-				if($ecode!=0) { error_out(18,$scriptname); }
-				foreach my $binmethod(keys %dasdir) {
-					$checkmfile="$interdir/18.$projectname.$binmethod.checkM";
-					my $wc=qx(wc -l $checkmfile);
-					my($wsize,$rest)=split(/\s+/,$wc);
-					if($wsize<4) { error_out(18,$scriptname,$checkmfile); }
-					}
-			}
-			else { print RED; print "Skipping CHECKM: DAS_Tool did not predict bins.\n"; print RESET; }
-			close(outfile4); open(outfile4,">>$syslogfile");
-		}
+    # #-------------------------------- STEP18: Checking of bins for completeness and contamination (checkM)
+		#
+		# if(($rpoint<=18) && ((!$test) || ($test>=18))) {
+		# 	if(!$DAS_Tool_empty){
+		# 		my $scriptname="18.checkM_batch.pl";
+		# 		print outfile3 "18\t$scriptname\n";
+		# 		$currtime=timediff();
+		# 		print outfile4 "\n[",$currtime->pretty,"]: STEP18 -> $scriptname\n";
+		# 		print BLUE "[",$currtime->pretty,"]: STEP18 -> CHECKING BINS: $scriptname\n"; print RESET;
+		# 		if($longtrace) { print " (This step will use checkM for estimating completeness and contamination for each bin)\n"; }
+		# 		my $ecode = system("perl $scriptdir/$scriptname $projectdir");
+		# 		if($ecode!=0) { error_out(18,$scriptname); }
+		# 		foreach my $binmethod(keys %dasdir) {
+		# 			$checkmfile="$interdir/18.$projectname.$binmethod.checkM";
+		# 			my $wc=qx(wc -l $checkmfile);
+		# 			my($wsize,$rest)=split(/\s+/,$wc);
+		# 			if($wsize<4) { error_out(18,$scriptname,$checkmfile); }
+		# 			}
+		# 	}
+		# 	else { print RED; print "Skipping CHECKM: DAS_Tool did not predict bins.\n"; print RESET; }
+		# 	close(outfile4); open(outfile4,">>$syslogfile");
+		# }
 
 
     #-------------------------------- STEP19: Make bin table
