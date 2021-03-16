@@ -120,7 +120,7 @@ print outmet "RNAs were predicted using Barrnap (Seeman 2014, Bioinformatics 30,
 
 #-- Running RDP classifier for 16S sequences
 
-$command="$rdpclassifier_soft -q $tempdir/16S.fasta -o $tempdir/16S.out -f filterbyconf";
+$command="$rdpclassifier_soft classify $tempdir/16S.fasta -o $tempdir/16S.out -f filterbyconf";
 print outsyslog "Running RDP classifier: $command\n";
 print "  Running RDP classifier (Wang et al 2007, Appl Environ Microbiol 73, 5261-7)\n";
 my $ecode = system $command;
