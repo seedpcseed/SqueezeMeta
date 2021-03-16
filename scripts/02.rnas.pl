@@ -62,12 +62,12 @@ foreach my $kingdom(keys %king) {
  		chomp;
 		if($_=~/^\#/) { print outfile1 "$_\n"; next; }
 		my @k=split(/\t/,$_);
-		my $idx="$k[3]-$k[4]"; 
+		my $idx="$k[3]-$k[4]";
 		$inrna{$k[0]}++;
 		my $newid="$k[0]\_$idx";
 		if($k[8]=~/Name\=(.*)?\_/) { $mol=$1; } else  { $mol=""; }
 		$rna{$k[0]}{$idx}{molecule}="$mol rRNA";
-		$rna{$k[0]}{$idx}{name}=$newid ; 
+		$rna{$k[0]}{$idx}{name}=$newid ;
 		$rna{$k[0]}{$idx}{kingdom}=$king{$kingdom} ;
 		$rname{$newid}=$king{$kingdom} ;
 		$k[8]="ID=$newid;".$k[8];                  # We must add the ID in the gff, for reading abundances later
@@ -85,8 +85,8 @@ foreach my $kingdom(keys %king) {
 	my($seq,$current)="";
 	while(<infile2>) {
 		chomp;
-		if($_=~/^\>([^ ]+)/) { 
-			my $contigname=$1; 
+		if($_=~/^\>([^ ]+)/) {
+			my $contigname=$1;
 			if($current) {
 
 				#-- Masking with 'N's
@@ -97,17 +97,17 @@ foreach my $kingdom(keys %king) {
 				my $replace=('N' x $longr);
 				my $rnaseq=substr($seq,$init-1,$longr,$replace);
 				print outfile2 ">$rna{$current}{$rns}{name}\t$rna{$current}{$rns}{molecule};$current|$rns;$rna{$current}{$rns}{kingdom}\n$rnaseq\n";
-				if($rna{$current}{$rns}{molecule}=~/16S/) { print outfile4 ">$rna{$current}{$rns}{name}\t$rna{$current}{$rns}{molecule};$current|$rns;$rna{$current}{$rns}{kingdom}\n$rnaseq\n"; } 
+				if($rna{$current}{$rns}{molecule}=~/16S/) { print outfile4 ">$rna{$current}{$rns}{name}\t$rna{$current}{$rns}{molecule};$current|$rns;$rna{$current}{$rns}{kingdom}\n$rnaseq\n"; }
 				}
 			}
-			if($current) { print outfile3 ">$current\n$seq\n"; }	
+			if($current) { print outfile3 ">$current\n$seq\n"; }
 			$seq="";
-			$current=$contigname;     
+			$current=$contigname;
 		}
 		else { $seq.=$_; }
 	}
 
-	print outfile3 ">$current\n$seq\n";	
+	print outfile3 ">$current\n$seq\n";
 	close infile2;
 	close outfile2;
 	close outfile3;
@@ -116,11 +116,11 @@ foreach my $kingdom(keys %king) {
 print "\n";
 close outfile4;
 print outmet "RNAs were predicted using Barrnap (Seeman 2014, Bioinformatics 30, 2068-9)\n";
-		
+
 
 #-- Running RDP classifier for 16S sequences
 
-$command="$rdpclassifier_soft classify $tempdir/16S.fasta -o $tempdir/16S.out -f filterbyconf";
+$command="$rdpclassifier_soft -q $tempdir/16S.fasta -o $tempdir/16S.out -f filterbyconf";
 print outsyslog "Running RDP classifier: $command\n";
 print "  Running RDP classifier (Wang et al 2007, Appl Environ Microbiol 73, 5261-7)\n";
 my $ecode = system $command;
@@ -148,7 +148,7 @@ while(<infile4>) {
 	my @f=split(/\t/,$_);
 	next if(!$f[0]);
 	my $lasttax=$f[$#f];
-	$lasttax=~s/unclassified\_//;	
+	$lasttax=~s/unclassified\_//;
 	$lasttax=~s/\"//g;
 	$lasttax=~s/\_.*//;
 	my $phyl=$parents{$lasttax};
@@ -186,7 +186,7 @@ while(<infile5>) {
 		$pos=~s/c//;
 		my($pos1,$pos2)=split(/\,/,$pos);
 		if($pos1<0) { $pos1=1; }
-		if($pos2<0) { $pos2=1; }		
+		if($pos2<0) { $pos2=1; }
 		my $dire="+";
 		if($pos1>$pos2) { $pos="$pos2-$pos1"; my $tpo=$pos1; $pos1=$pos2; $pos2=$tpo; $dire="-"; }
 		else { $pos="$pos1-$pos2"; }
@@ -200,10 +200,10 @@ close infile5;
 print outmet "tRNA/tmRNA sequences were predicted using Aragorn (Laslett & Canback 2004, Nucleic Acids Res 31, 11-16)\n";
 close outfile6;
 close outfile7;
-		
-		
+
+
 	#-- Masking with 'N's
-	
+
 open(outfile7,">$tempdir/contigs.prov") || die "Can't open contigs.prov for writing\n";
 
 open(outfile8,">$resultpath/02.$project.trnas.fasta") || die "Can't open trna file for writing\n";
@@ -211,8 +211,8 @@ open(infile6,$targetfile) || die "Can't open $targetfile\n";
 my($seq,$current)="";
 while(<infile6>) {
 	chomp;
-	if($_=~/^\>([^ ]+)/) { 
-		my $contigname=$1; 
+	if($_=~/^\>([^ ]+)/) {
+		my $contigname=$1;
 		if($current) {
 
 			#-- Masking with 'N's
@@ -225,9 +225,9 @@ while(<infile6>) {
 			print outfile8 ">$current\_$rns\n$rnaseq\n";
 			}
 		}
-		if($current) { print outfile7 ">$current\n$seq\n"; }	
+		if($current) { print outfile7 ">$current\n$seq\n"; }
 		$seq="";
-		$current=$contigname;     
+		$current=$contigname;
 	}
 	else { $seq.=$_; }
 }
@@ -239,7 +239,7 @@ if($current) {	#-- Last entry
 		my $rnaseq=substr($seq,$init-1,$longr,$replace);
 		print outfile8 ">$current\_$rns\n$rnaseq\n";
 		}
-	print outfile7 ">$current\n$seq\n"; 	
+	print outfile7 ">$current\n$seq\n";
 	}
 close infile6;
 close outfile7;
@@ -247,10 +247,10 @@ close outfile8;
 close outmet;
 
 system("mv $tempdir/contigs.prov $targetfile");
-		
+
 #-- Creating the RNAs gff file
 
-my $gffout="$tempdir/02.$project.rna.gff";			     		
+my $gffout="$tempdir/02.$project.rna.gff";
 if(-e $gffout) { system("rm $gffout"); }
 $command="cat $tempdir/*gff.mod > $gffout";
 print outsyslog "Creating new gff file: $command\n";
