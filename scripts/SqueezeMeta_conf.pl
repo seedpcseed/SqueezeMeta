@@ -89,7 +89,7 @@ $mapper          = "bowtie";
 
 #-- External software
 
-metabat_soft       = "$installpath/bin/metabat2";
+$metabat_soft        = "$installpath/bin/metabat2";
 $maxbin_soft        = "$installpath/bin/MaxBin/run_MaxBin.pl";
 $spades_soft        = "$installpath/bin/SPAdes/spades.py";
 $barrnap_soft       = "$installpath/bin/barrnap";
