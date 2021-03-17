@@ -17,7 +17,7 @@ use lib ".";
 my $version="1.3.1";
 my $start_run = time();
 
-my($rpoint,$hel); 
+my($rpoint,$hel);
 my $result = GetOptions ("step=i" => \$rpoint,"h" => \$hel);
 
 my $helptext = <<END_MESSAGE;
@@ -31,7 +31,7 @@ END_MESSAGE
 
 
 
-if($hel) { die "$helptext\n"; } 
+if($hel) { die "$helptext\n"; }
 
 my $projectdir=pop @ARGV;
 if(!$projectdir) { print RED; print "Please indicate the project to restart\nUsage: restart.pl  [options] project\n"; print RESET;  die; }
@@ -46,7 +46,7 @@ our($datapath,$assembler,$outassembly,$nomaxbin,$nometabat,$lowmem,$minion);
 our($nocog,$nokegg,$nopfam,$nobins,$opt_db);
 our($numsamples,$numthreads,$mode,$mincontiglen,$assembler,$extassembly,$equivfile,$rawfastq,$evalue,$miniden,$spadesoptions,$megahitoptions,$assembler_options,$doublepass);
 our($methodsfile, $projectname,$scriptdir,$databasepath,$extdatapath,$interdir,$softdir,$basedir,$datapath,$resultpath,$tempdir,$mappingfile,$contigsfna,$nomaxbin,$contigslen,$mcountfile,$rnafile,$checkmfile,$gff_file,$gff_file_blastx,$aafile,$ntfile,$daafile,$taxdiamond,$cogdiamond,$keggdiamond,$pfamhmmer,$fun3tax,$fun3kegg,$fun3cog,$fun3pfam,$allorfs,$alllog,$mapcountfile,$contigcov,$contigtable,$mergedfile,$bintax,$checkmfile,$bincov,$bintable,$contigsinbins,$coglist,$kegglist,$pfamlist,$taxlist,$nr_db,$cog_db,$kegg_db,$lca_db,$bowtieref,$pfam_db,$metabat_soft,$maxbin_soft,$spades_soft,$barrnap_soft,$bowtie2_build_soft,$bowtie2_x_soft,$bedtools_soft,$diamond_soft,$hmmer_soft,$megahit_soft,$prinseq_soft,$prodigal_soft,$cdhit_soft,$toamos_soft,$minimus2_soft,$canu_soft,$trimmomatic_soft,$dastool_soft);
-our(%bindirs,%dasdir); 
+our(%bindirs,%dasdir);
 my($finaltrace);
 my $progress="$projectdir/progress";
 
@@ -54,7 +54,7 @@ my $progress="$projectdir/progress";
 
 my $sflag=$rpoint;
 my($numsamples,$mode);
-open(infile1,$progress) or do { print RED; print "Can't open progress file file $progress\n"; print RESET;  die; }; 
+open(infile1,$progress) or do { print RED; print "Can't open progress file file $progress\n"; print RESET;  die; };
 while(<infile1>) {
 	chomp $_;
 	next if(!$_);
@@ -68,7 +68,7 @@ close infile1;
 	#-- Create new progress, append to existing syslog
 
 my $currtime;
-open(outfile1,">$projectdir/progress") or do { print RED; print "Can't open $projectdir/progress for writing\n"; print RESET;  die; }; 
+open(outfile1,">$projectdir/progress") or do { print RED; print "Can't open $projectdir/progress for writing\n"; print RESET;  die; };
 open(outfile2,">>$projectdir/syslog")  or do { print RED; print "Can't open $projectdir/syslog for writing\n"; print RESET;  die; };
 $currtime=timediff();
 print outfile2 "Restarting project $projectname, ",scalar localtime,"\n";
@@ -114,8 +114,8 @@ my $DAS_Tool_empty=0;
 		my $ecode = system("perl $scriptdir/$scriptname $projectdir");
 	        if($ecode!=0)	{ error_out(1,$scriptname); }
 		}
-	
-		#-- In sequential mode. 
+
+		#-- In sequential mode.
 
 	elsif($mode=~/sequential/) {
  		my $scriptname="01.run_assembly.pl";
@@ -128,9 +128,9 @@ my $DAS_Tool_empty=0;
 		my $wc=qx(wc -l $contigsfna);
 		my($wsize,$rest)=split(/\s+/,$wc);
 		if($wsize<2)	{ error_out(1,$scriptname,$contigsfna); }
-		}		
-	}   	
-		
+		}
+	}
+
    #-------------------------------- STEP1.5: Merge assemblies
 
 	if(($mode=~/merged|seqmerge/) && ($rpoint<=1.5)) {
@@ -147,8 +147,8 @@ my $DAS_Tool_empty=0;
 		my($wsize,$rest)=split(/\s+/,$wc);
 		if($wsize<2)	{ error_out(1.5,$scriptname,$contigsfna); }
 	}
-	   	
-		
+
+
     #-------------------------------- STEP2: Run RNA prediction
 
 	if($rpoint<=2) {
@@ -164,7 +164,7 @@ my $DAS_Tool_empty=0;
 		my($wsize,$rest)=split(/\s+/,$wc);
 		if($wsize<2)    { error_out(2,$scriptname,$masked); }
 	}
-			
+
     #-------------------------------- STEP3: Run gene prediction
 
 	if($rpoint<=3) {
@@ -179,7 +179,7 @@ my $DAS_Tool_empty=0;
 		my($wsize,$rest)=split(/\s+/,$wc);
 		if($wsize<2)    { error_out(3,$scriptname,$aafile); }
 	}
-			
+
     #-------------------------------- STEP4: Run Diamond for taxa and functions
 
 	if($rpoint<=4) {
@@ -194,7 +194,7 @@ my $DAS_Tool_empty=0;
 		my($wsize,$rest)=split(/\s+/,$wc);
 		if($wsize<1)    { error_out(4,$scriptname,$taxdiamond); }
 	}
-			
+
     #-------------------------------- STEP5: Run hmmer for PFAM annotation
 
 	if($rpoint<=5) {
@@ -205,13 +205,13 @@ my $DAS_Tool_empty=0;
 			print outfile2 "\n[",$currtime->pretty,"]: STEP5 -> $scriptname\n";
 			print CYAN "[",$currtime->pretty,"]: STEP5 -> HMMER/PFAM: $scriptname\n"; print RESET;
 			my $ecode = system("perl $scriptdir/$scriptname $projectdir");
-			if($ecode!=0)        { error_out(5,$scriptname); }			
+			if($ecode!=0)        { error_out(5,$scriptname); }
 			my $wc=qx(wc -l $pfamhmmer);
 			my($wsize,$rest)=split(/\s+/,$wc);
 			if($wsize<4)    { error_out(5,$scriptname,$pfamhmmer); }
 		}
 	}
-			
+
     #-------------------------------- STEP6: LCA algorithm for taxa annotation
 
 	if($rpoint<=6) {
@@ -226,7 +226,7 @@ my $DAS_Tool_empty=0;
 		my($wsize,$rest)=split(/\s+/,$wc);
 		if($wsize<2)    { error_out(6,$scriptname,$pfamhmmer); }
 	}
-			
+
     #-------------------------------- STEP7: fun3 for COGs, KEGG and PFAM annotation
 
 	if($rpoint<=7) {
@@ -253,7 +253,7 @@ my $DAS_Tool_empty=0;
 				}
 			my $optdbsw;
 			if($opt_db) {
-				open(infile0,$opt_db) || warn "Can't open EXTDB file $opt_db\n"; 
+				open(infile0,$opt_db) || warn "Can't open EXTDB file $opt_db\n";
 				while(<infile0>) {
 					my($dbname,$extdb,$dblist)=split(/\t/,$_);
 					my $wc=qx(wc -l $resultpath/07.$projectname.fun3.$dbname);
@@ -265,9 +265,9 @@ my $DAS_Tool_empty=0;
 			if(($wsizeCOG<2) && ($wsizeKEGG<2) && ($wsizePFAM<2) && ($optdbsw<2)) { error_out(7,$scriptname,"$fun3cog, $fun3kegg and $fun3pfam"); }
 		}
 	}
-			
+
     #-------------------------------- STEP8: Blastx on the unannotated parts of the contigs
-	
+
 	if($rpoint<=8) {
 		if($doublepass) {
 			my $scriptname="08.blastx.pl";
@@ -282,7 +282,7 @@ my $DAS_Tool_empty=0;
 			if($wsize<2)         { error_out(8,$scriptname,$gff_file_blastx); }
 			}
 	}
-		
+
     #-------------------------------- STEP9: Taxonomic annotation for the contigs (consensus of gene annotations)
 
 
@@ -298,9 +298,9 @@ my $DAS_Tool_empty=0;
 		my($wsize,$rest)=split(/\s+/,$wc);
 		if($wsize<2)         { error_out(9,$scriptname,$alllog); }
 	}
-			
+
     #-------------------------------- STEP10: Mapping of reads onto contigs for abundance calculations
-	
+
 	if($rpoint<=10) {
 		my $scriptname="10.mapsamples.pl";
 		print outfile1 "10\t$scriptname\n";
@@ -313,9 +313,9 @@ my $DAS_Tool_empty=0;
 		my($wsize,$rest)=split(/\s+/,$wc);
 		if($wsize<3)         { error_out(10,$scriptname,$mapcountfile); }
 	}
-			
+
     #-------------------------------- STEP11: Count of taxa abundances
-	
+
 	if($rpoint<=11) {
 		my $scriptname="11.mcount.pl";
 		print outfile1 "11\t$scriptname\n";
@@ -328,9 +328,9 @@ my $DAS_Tool_empty=0;
 		my($wsize,$rest)=split(/\s+/,$wc);
 		if($wsize<2)         { error_out(11,$scriptname,$mcountfile); }
 	}
-			
+
     #-------------------------------- STEP12: Count of function abundances
-	
+
 	if(($rpoint<=12)) {
 		my $scriptname="12.funcover.pl";
 		if((!$nocog) || (!$nokegg) || ($opt_db)) {
@@ -349,9 +349,9 @@ my $DAS_Tool_empty=0;
 		if(($wsizeCOG<3) && ($wsizeKEGG<3)) { error_out(12,$scriptname,"$cogfuncover and/or $keggfuncover"); }
 			}
 	}
-			
+
     #-------------------------------- STEP13: Generation of the gene table
-		
+
 	if($rpoint<=13) {
 		my $scriptname="13.mergeannot2.pl";
 		print outfile1 "13\t$scriptname\n";
@@ -364,10 +364,10 @@ my $DAS_Tool_empty=0;
 		my($wsize,$rest)=split(/\s+/,$wc);
 		if($wsize<3)         { error_out(13,$scriptname,$mergedfile); }
 	}
-			
-    #-------------------------------- STEP14: Running Maxbin (only for merged or coassembly modes)		
-	
-	if(!$nobins) {	       
+
+    #-------------------------------- STEP14: Running Maxbin (only for merged or coassembly modes)
+
+	if(!$nobins) {
 		if(($rpoint<=14) && (!$nomaxbin)) {
 			my $scriptname="14.bin_maxbin.pl";
 			print outfile1 "14\t$scriptname\n";
@@ -385,9 +385,9 @@ my $DAS_Tool_empty=0;
 			my($wsize,$rest)=split(/\s+/,$wc);
 			if($wsize<2) { warn "WARNING in STEP14 -> $scriptname. File $firstfile is empty, no MaxBin results!\n";  $finaltrace.="WARNING in STEP15: No Maxbin results!\n"; }
 		}
-			
-    #-------------------------------- STEP15: Running Metabat (only for merged or coassembly modes)		
-	
+
+    #-------------------------------- STEP15: Running Metabat (only for merged or coassembly modes)
+
 		if(($rpoint<=15) && (!$nometabat)) {
 			my $scriptname="15.bin_metabat2.pl";
 			print outfile1 "15\t$scriptname\n";
@@ -405,9 +405,9 @@ my $DAS_Tool_empty=0;
 			my($wsize,$rest)=split(/\s+/,$wc);
 			if($wsize<2) { warn "WARNING in STEP15 -> $scriptname. File $firstfile is empty, no Metabat2 results!\n"; $finaltrace.="WARNING in STEP15: No Metabat2 results!\n"; }
 		}
- 
-    #-------------------------------- STEP16: DAS Tool merging of binning results (only for merged or coassembly modes)		
-	
+
+    #-------------------------------- STEP16: DAS Tool merging of binning results (only for merged or coassembly modes)
+
 		if(($rpoint<=16)) {
 			my $scriptname="16.dastool.pl";
 			print outfile1 "16\t$scriptname\n";
@@ -426,12 +426,12 @@ my $DAS_Tool_empty=0;
 			if($wsize<2) {
 				print("WARNING: File $firstfile is empty!. DAStool did not generate results\n");
 				$DAS_Tool_empty = 1;
-				$finaltrace.="DAS Tool abnormal termination: file $firstfile is empty. There are NO BINS!\n";		
+				$finaltrace.="DAS Tool abnormal termination: file $firstfile is empty. There are NO BINS!\n";
 			}
 		}
-			
-    #-------------------------------- STEP17: Taxonomic annotation for the bins (consensus of contig annotations)		
-	
+
+    #-------------------------------- STEP17: Taxonomic annotation for the bins (consensus of contig annotations)
+
 		if($rpoint<=17) {
 			if(!$DAS_Tool_empty){
 				my $scriptname="17.addtax2.pl";
@@ -448,30 +448,30 @@ my $DAS_Tool_empty=0;
 		else{ print RED; print("Skipping BIN TAX ASSIGNMENT: DAS_Tool did not predict bins.\n"); print RESET; }
 		}
 
-    #-------------------------------- STEP18: Checking of bins for completeness and contamination (checkM)		
-	
-		if($rpoint<=18) {
-			if(!$DAS_Tool_empty){
-				my $scriptname="18.checkM_batch.pl";
-				print outfile1 "18\t$scriptname\n";
-				$currtime=timediff();
-				print outfile2 "\n[",$currtime->pretty,"]: STEP18 -> $scriptname\n";
-				print CYAN "[",$currtime->pretty,"]: STEP18 -> CHECKING BINS: $scriptname\n"; print RESET;
-				my $ecode = system("perl $scriptdir/$scriptname $projectdir");
-				if($ecode!=0) { error_out(18,$scriptname); }
-				foreach my $binmethod(keys %dasdir) {
-					$checkmfile="$interdir/18.$projectname.$binmethod.checkM";
-					my $wc=qx(wc -l $checkmfile);
-					my($wsize,$rest)=split(/\s+/,$wc);
-					if($wsize<4) { error_out(18,$scriptname,$checkmfile); }
-				}
-			}
-			else{ print RED; print("Skipping CHECKM: DAS_Tool did not predict bins.\n"); print RESET; }
-		}
+    #-------------------------------- STEP18: Checking of bins for completeness and contamination (checkM)
 
-			
-    #-------------------------------- STEP19: Make bin table		
-	
+		# if($rpoint<=18) {
+		# 	if(!$DAS_Tool_empty){
+		# 		my $scriptname="18.checkM_batch.pl";
+		# 		print outfile1 "18\t$scriptname\n";
+		# 		$currtime=timediff();
+		# 		print outfile2 "\n[",$currtime->pretty,"]: STEP18 -> $scriptname\n";
+		# 		print CYAN "[",$currtime->pretty,"]: STEP18 -> CHECKING BINS: $scriptname\n"; print RESET;
+		# 		my $ecode = system("perl $scriptdir/$scriptname $projectdir");
+		# 		if($ecode!=0) { error_out(18,$scriptname); }
+		# 		foreach my $binmethod(keys %dasdir) {
+		# 			$checkmfile="$interdir/18.$projectname.$binmethod.checkM";
+		# 			my $wc=qx(wc -l $checkmfile);
+		# 			my($wsize,$rest)=split(/\s+/,$wc);
+		# 			if($wsize<4) { error_out(18,$scriptname,$checkmfile); }
+		# 		}
+		# 	}
+		# 	else{ print RED; print("Skipping CHECKM: DAS_Tool did not predict bins.\n"); print RESET; }
+		# }
+
+
+    #-------------------------------- STEP19: Make bin table
+
 		if($rpoint<=19) {
 			if(!$DAS_Tool_empty){
 				my $scriptname="19.getbins.pl";
@@ -490,7 +490,7 @@ my $DAS_Tool_empty=0;
 	}
 
 
-    #-------------------------------- STEP20: Make contig table		
+    #-------------------------------- STEP20: Make contig table
 
 	if($rpoint<=20) {
 		my $scriptname="20.getcontigs.pl";
@@ -505,9 +505,9 @@ my $DAS_Tool_empty=0;
 		if($wsize<3)         { error_out(20,$scriptname,$contigtable); }
 	}
 
-    #-------------------------------- STEP21: Pathways in bins          
+    #-------------------------------- STEP21: Pathways in bins
 
-	if(!$nobins) {	       
+	if(!$nobins) {
   		if($rpoint<=21) {
 			if((!$DAS_Tool_empty) && (!$nokegg)) {
 				my $scriptname="21.minpath.pl";
@@ -526,7 +526,7 @@ my $DAS_Tool_empty=0;
 		}
 	}
 
-    #-------------------------------- STEP22: Make stats		
+    #-------------------------------- STEP22: Make stats
 
 	if($rpoint<=22) {
 		my $scriptname="22.stats.pl";
@@ -542,14 +542,14 @@ my $DAS_Tool_empty=0;
 		if($wsize<10)        { error_out(22,$scriptname,$statfile); }
 	}
 
-    #-------------------------------- END OF PIPELINE		
+    #-------------------------------- END OF PIPELINE
 
 	print outfile1 "END\n";
 	$currtime=timediff();
 	print "\nDeleting temporary files in $tempdir\n";
 	print outfile2 "\nDeleting temporary files in $tempdir\n";
 	system("rm -r $tempdir/*");
-	if(-e "$datapath/megahit/final.contigs.fa") { system("rm -r $datapath/megahit/intermediate_contigs; rm $datapath/megahit/final.contigs.fa"); } 
+	if(-e "$datapath/megahit/final.contigs.fa") { system("rm -r $datapath/megahit/intermediate_contigs; rm $datapath/megahit/final.contigs.fa"); }
 	print outfile2 "\n[",$currtime->pretty,"]: FINISHED -> Have fun!\n";
 	print CYAN "[",$currtime->pretty,"]: FINISHED -> Have fun!\n"; print RESET;
 	if($finaltrace) { print "\nWARNINGS:\n$finaltrace\n"; }
@@ -584,4 +584,3 @@ sub error_out {
 	print RESET;
 	die;
 }
-
